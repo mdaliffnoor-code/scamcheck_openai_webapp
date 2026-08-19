@@ -1,53 +1,198 @@
 {% extends "base.html" %}
 {% block title %}ScamCheck | Scam Risk Assessment{% endblock %}
+
 {% block content %}
 <section class="hero">
-<div class="shell hero-inner">
-    <div class="hero-brand"><div class="hero-symbol">S</div><h1>SCAMCHECK</h1></div>
-    <p class="hero-copy">Check suspicious phone numbers, URLs and screenshots before taking action. ScamCheck combines scam reports, threat intelligence and AI-assisted analysis to identify possible warning signs.</p>
-    <div class="scanner-card">
-        <div class="tabs">
-            <button class="tab active" data-target="phone-panel">PHONE</button>
-            <button class="tab" data-target="url-panel">URL</button>
-            <button class="tab" data-target="file-panel">SCREENSHOT</button>
+    <div class="hero-decoration hero-decoration-left"></div>
+    <div class="hero-decoration hero-decoration-right"></div>
+
+    <div class="shell hero-inner">
+        <<div class="hero-logo-stage">
+
+    <!-- LIGHT THEME -->
+    <img
+        src="{{ url_for('static', filename='images/scam-check-logo-light.png') }}"
+        alt="ScamCheck"
+        class="hero-logo logo-light"
+    >
+
+    <!-- DARK THEME -->
+    <img
+        src="{{ url_for('static', filename='images/scam-check-logo.png') }}"
+        alt="ScamCheck"
+        class="hero-logo logo-dark"
+    >
+
+</div>
+
+        <p class="hero-copy">
+            Check suspicious phone numbers, URLs and screenshots before taking action.
+            ScamCheck combines scam reports, threat intelligence and AI-assisted analysis
+            to identify possible warning signs.
+        </p>
+
+        <div class="scanner-card">
+            <div class="tabs" role="tablist" aria-label="Scam checking tools">
+                <button class="tab active" data-target="phone-panel" type="button">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>PHONE</span>
+                </button>
+                <button class="tab" data-target="url-panel" type="button">
+                    <i class="fa-solid fa-link"></i>
+                    <span>URL</span>
+                </button>
+                <button class="tab" data-target="file-panel" type="button">
+                    <i class="fa-regular fa-image"></i>
+                    <span>SCREENSHOT</span>
+                </button>
+            </div>
+
+            <div id="phone-panel" class="tab-panel active">
+                <div class="scan-icon"><i class="fa-solid fa-phone-volume"></i></div>
+                <h2>Check a phone number</h2>
+                <p>Search a phone number against the ScamCheck scam-report database.</p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('check_phone') }}"
+                    class="login-required-form scan-form"
+                >
+                    <input
+                        type="text"
+                        name="phone"
+                        placeholder="+65 8123 4567"
+                        autocomplete="off"
+                    >
+                    <button type="submit">Check Number</button>
+                </form>
+
+                <div class="service-label">Planned backend: Azure SQL</div>
+            </div>
+
+            <div id="url-panel" class="tab-panel">
+                <div class="scan-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <h2>Check a suspicious URL</h2>
+                <p>Submit a suspicious website address for threat-intelligence screening.</p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('check_url') }}"
+                    class="login-required-form scan-form"
+                >
+                    <input
+                        type="text"
+                        name="url"
+                        placeholder="example.com or https://example.com"
+                        autocomplete="off"
+                    >
+                    <button type="submit">Check URL</button>
+                </form>
+
+                <div class="service-label">Planned backend: Google Safe Browsing</div>
+            </div>
+
+            <div id="file-panel" class="tab-panel">
+                <div class="file-icon"><i class="fa-regular fa-file-image"></i></div>
+                <h2>Analyse a suspicious screenshot</h2>
+                <p>Upload a screenshot of a suspicious message for AI-assisted risk analysis.</p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('check_screenshot') }}"
+                    enctype="multipart/form-data"
+                    class="login-required-form upload-form"
+                >
+                    <label class="choose-file">
+                        <input
+                            type="file"
+                            name="file"
+                            id="file-input"
+                            accept=".png,.jpg,.jpeg,.pdf"
+                        >
+                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        <span>Choose file</span>
+                    </label>
+
+                    <div id="file-name" class="file-name">No file selected</div>
+                    <button type="submit" class="primary-button">Upload &amp; Analyse</button>
+                </form>
+
+                <div class="service-label">
+                    Planned backend: Azure Blob Storage + OpenAI API
+                </div>
+            </div>
         </div>
 
-        <div id="phone-panel" class="tab-panel active">
-            <div class="scan-icon">#</div><h2>Check a phone number</h2><p>Search a phone number against the ScamCheck scam-report database.</p>
-            <form method="POST" action="{{ url_for('check_phone') }}" class="login-required-form scan-form"><input type="text" name="phone" placeholder="+65 8123 4567" autocomplete="off"><button type="submit">Check Number</button></form>
-            <div class="service-label">Planned backend: Azure SQL</div>
-        </div>
-
-        <div id="url-panel" class="tab-panel">
-            <div class="scan-icon">⌁</div><h2>Check a suspicious URL</h2><p>Submit a suspicious website address for threat-intelligence screening.</p>
-            <form method="POST" action="{{ url_for('check_url') }}" class="login-required-form scan-form"><input type="text" name="url" placeholder="example.com or https://example.com" autocomplete="off"><button type="submit">Check URL</button></form>
-            <div class="service-label">Planned backend: Google Safe Browsing</div>
-        </div>
-
-        <div id="file-panel" class="tab-panel">
-            <div class="file-icon">▧</div><h2>Analyse a suspicious screenshot</h2><p>Upload a screenshot of a suspicious message for AI-assisted risk analysis.</p>
-            <form method="POST" action="{{ url_for('check_screenshot') }}" enctype="multipart/form-data" class="login-required-form upload-form">
-                <label class="choose-file"><input type="file" name="file" id="file-input" accept=".png,.jpg,.jpeg,.pdf"><span>Choose file</span></label>
-                <div id="file-name" class="file-name">No file selected</div>
-                <button type="submit" class="primary-button">Upload & Analyse</button>
-            </form>
-            <div class="service-label">Planned backend: Azure Blob Storage + OpenAI API</div>
+        <div class="privacy-note">
+            <i class="fa-solid fa-lock"></i>
+            <div>
+                <strong>Privacy notice</strong>
+                <span>
+                    Do not upload passwords, banking credentials, NRIC numbers or highly
+                    sensitive personal information. Screenshot analysis is intended only
+                    as an advisory risk assessment.
+                </span>
+            </div>
         </div>
     </div>
-    <div class="privacy-note"><strong>Privacy notice:</strong> Do not upload passwords, banking credentials, NRIC numbers or highly sensitive personal information. Screenshot analysis is intended only as an advisory risk assessment.</div>
-</div>
 </section>
 
-<section class="risk-section"><div class="shell"><p class="eyebrow">HOW RESULTS ARE PRESENTED</p><h2 class="section-title">Simple risk assessment</h2>
-<div class="risk-grid">
-    <div class="risk-card low"><span>LOW</span><h3>No strong warning signs found</h3><p>Users should still verify unexpected requests independently.</p></div>
-    <div class="risk-card potential"><span>POTENTIAL RISK</span><h3>Suspicious indicators detected</h3><p>Proceed carefully and verify the sender through an official channel.</p></div>
-    <div class="risk-card high"><span>HIGH RISK</span><h3>Multiple scam indicators detected</h3><p>Do not click links, share credentials or make payment.</p></div>
-</div></div></section>
+<section class="risk-section">
+    <div class="shell">
+        <div class="section-heading">
+            <p class="eyebrow">HOW RESULTS ARE PRESENTED</p>
+            <h2 class="section-title">Simple risk assessment</h2>
+        </div>
 
-<section class="how-section"><div class="shell"><div class="feature-grid">
-<div><span class="feature-number">01</span><h3>Submit</h3><p>Check a phone number, suspicious URL or screenshot.</p></div>
-<div><span class="feature-number">02</span><h3>Assess</h3><p>ScamCheck uses the relevant data source or API for each check.</p></div>
-<div><span class="feature-number">03</span><h3>Respond</h3><p>Receive an advisory risk level and recommended next action.</p></div>
-</div></div></section>
+        <div class="risk-grid">
+            <div class="risk-card low">
+                <span class="risk-label">LOW</span>
+                <div class="risk-icon"><i class="fa-regular fa-circle-check"></i></div>
+                <h3>No strong warning signs found</h3>
+                <p>Users should still verify unexpected requests independently.</p>
+            </div>
+
+            <div class="risk-card potential">
+                <span class="risk-label">POTENTIAL RISK</span>
+                <div class="risk-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3>Suspicious indicators detected</h3>
+                <p>Proceed carefully and verify the sender through an official channel.</p>
+            </div>
+
+            <div class="risk-card high">
+                <span class="risk-label">HIGH RISK</span>
+                <div class="risk-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                <h3>Multiple scam indicators detected</h3>
+                <p>Do not click links, share credentials or make payment.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="how-section">
+    <div class="shell">
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-number">01</span>
+                <div class="feature-icon"><i class="fa-regular fa-paper-plane"></i></div>
+                <h3>Submit</h3>
+                <p>Check a phone number, suspicious URL or screenshot.</p>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-number">02</span>
+                <div class="feature-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                <h3>Assess</h3>
+                <p>ScamCheck uses the relevant data source or API for each check.</p>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-number">03</span>
+                <div class="feature-icon"><i class="fa-regular fa-lightbulb"></i></div>
+                <h3>Respond</h3>
+                <p>Receive an advisory risk level and recommended next action.</p>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

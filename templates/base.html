@@ -4,90 +4,191 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ScamCheck{% endblock %}</title>
+
+    <!-- Prevent a light-theme flash when the visitor previously selected dark mode -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("scamcheck-theme");
+            if (savedTheme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+            }
+        })();
+    </script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
 <header class="site-header">
     <div class="shell nav-wrap">
-        <a href="{{ url_for('home') }}" class="brand">
-            <span class="brand-symbol">S</span><span>SCAMCHECK</span>
-        </a>
-        <nav class="nav-links">
-            <a href="{{ url_for('home') }}">Check</a>
-            <a href="{{ url_for('resources') }}">Resources</a>
-            
-{% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <a href="{{ url_for('history') }}">History</a>
-{% else %}
-            <a href="{{ url_for('login') }}">Login</a>
-            <a href="{{ url_for('register') }}" class="nav-button">Register</a>
-{% endif %}
+        <a href="{{ url_for('home') }}" class="brand" aria-label="ScamCheck home">
+
+    <span class="brand-logo-wrap">
+
+        <img
+            src="{{ url_for('static', filename='images/scam-check-logo-light.png') }}"
+            alt="ScamCheck"
+            class="brand-logo logo-light"
+        >
+
+        <img
+            src="{{ url_for('static', filename='images/scam-check-logo.png') }}"
+            alt="ScamCheck"
+            class="brand-logo logo-dark"
+        >
+
+    </span>
+
+</a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}" class="nav-link nav-link-active">Check</a>
+            <a href="{{ url_for('resources') }}" class="nav-link">Resources</a>
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('history') }}" class="nav-link">History</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+                <a href="{{ url_for('register') }}" class="nav-button">Register</a>
+            {% endif %}
+
+            <button
+                type="button"
+                id="themeToggle"
+                class="theme-toggle"
+                aria-label="Switch theme"
+                title="Switch light/dark theme"
+            >
+                <i id="themeIcon" class="fa-solid fa-moon"></i>
+            </button>
         </nav>
     </div>
 </header>
+
 <main>
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}<div class="shell flash-wrap">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
-{% endwith %}
-{% block content %}{% endblock %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="shell flash-wrap">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
 </main>
+
 <footer class="site-footer">
     <div class="shell footer-grid">
-        <div><h4>ScamCheck</h4><p>AI-assisted scam awareness and screening platform.</p></div>
-        <div><h4>Tools</h4><a href="{{ url_for('home') }}">Phone Check</a><a href="{{ url_for('home') }}">URL Check</a><a href="{{ url_for('home') }}">Screenshot Check</a></div>
-        <div><h4>Resources</h4><a href="{{ url_for('resources') }}">Scam Bulletins</a><a href="{{ url_for('history') }}">My History</a></div>
-        <div><h4>Important</h4><p>ScamCheck provides an advisory risk assessment and should not be treated as a guarantee that content is safe.</p></div>
+        <div class="footer-brand-column">
+            <div class="footer-brand">ScamCheck</div>
+            <p>AI-assisted scam awareness and screening platform.</p>
+        </div>
+
+        <div>
+            <h4>Tools</h4>
+            <a href="{{ url_for('home') }}">Phone Check</a>
+            <a href="{{ url_for('home') }}">URL Check</a>
+            <a href="{{ url_for('home') }}">Screenshot Check</a>
+        </div>
+
+        <div>
+            <h4>Resources</h4>
+            <a href="{{ url_for('resources') }}">Scam Bulletins</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('history') }}">My History</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">My History</a>
+            {% endif %}
+        </div>
+
+        <div>
+            <h4>Important</h4>
+            <p>
+                ScamCheck provides an advisory risk assessment and should not be treated
+                as a guarantee that content is safe.
+            </p>
+        </div>
     </div>
-    <div class="shell footer-bottom">© 2026 ScamCheck · Cloud & DevOps Capstone Proof of Concept</div>
+
+    <div class="shell footer-bottom">
+        © 2026 ScamCheck · Cloud &amp; DevOps Capstone Proof of Concept
+    </div>
 </footer>
 
 {% if not current_user.is_authenticated %}
-
 <div id="auth-required-modal" class="auth-required-overlay">
-
     <div class="auth-required-modal">
-
         <button
             type="button"
             class="auth-required-close"
             id="auth-required-close"
             aria-label="Close"
-        >
-            ×
-        </button>
+        >×</button>
 
         <p class="eyebrow">ACCOUNT REQUIRED</p>
-
         <h2>Login Required</h2>
-
         <p class="muted">
             Please log in or create an account to use ScamCheck's scanning tools.
         </p>
 
         <div class="auth-required-actions">
-
-            <a
-                href="{{ url_for('register') }}"
-                class="auth-modal-register"
-            >
-                Register
-            </a>
-
-            <a
-                href="{{ url_for('login') }}"
-                class="auth-modal-login"
-            >
-                Log in
-            </a>
-
+            <a href="{{ url_for('register') }}" class="auth-modal-register">Register</a>
+            <a href="{{ url_for('login') }}" class="auth-modal-login">Log in</a>
         </div>
-
     </div>
-
 </div>
-
 {% endif %}
+
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+
+    if (!themeToggle || !themeIcon) return;
+
+    function updateThemeIcon() {
+        const isDark =
+            document.documentElement.getAttribute("data-theme") === "dark";
+
+        themeIcon.className = isDark
+            ? "fa-solid fa-sun"
+            : "fa-solid fa-moon";
+
+        const label = isDark
+            ? "Switch to light theme"
+            : "Switch to dark theme";
+
+        themeToggle.setAttribute("aria-label", label);
+        themeToggle.title = label;
+    }
+
+    updateThemeIcon();
+
+    themeToggle.addEventListener("click", function () {
+        const isDark =
+            document.documentElement.getAttribute("data-theme") === "dark";
+
+        if (isDark) {
+            document.documentElement.removeAttribute("data-theme");
+            localStorage.setItem("scamcheck-theme", "light");
+        } else {
+            document.documentElement.setAttribute("data-theme", "dark");
+            localStorage.setItem("scamcheck-theme", "dark");
+        }
+
+        updateThemeIcon();
+    });
+});
+</script>
+
 </body>
 </html>
