@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}History | ScamCheck{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+    <div class="shell">
+
+        <p class="eyebrow">MY ACTIVITY</p>
+        <h1>Scan History</h1>
+
+        <p class="muted">
+            Review your previous ScamCheck scans and risk assessments.
+        </p>
+
+        {% if scans %}
+
+        <div class="history-table-wrap">
+
+            <table class="history-table">
+
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Item</th>
+                        <th>Risk Level</th>
+                        <th>Date & Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for scan in scans %}
+
+                <tr>
+
+                    <td>
+                        {{ scan.scan_type | capitalize }}
+                    </td>
+
+                    <td>
+                        {% if scan.scan_type == "url" %}
+
+                            <a
+                                href="{{ scan.input_value }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="history-item-link"
+                            >
+                                {{ scan.input_value }}
+                            </a>
+
+                        {% elif scan.scan_type == "screenshot" %}
+
+                            {{ scan.input_value }}
+
+                        {% else %}
+
+                            {{ scan.input_value }}
+
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        {% if scan.risk_level == "HIGH RISK" %}
+
+                            <span class="risk-badge risk-high">
+                                HIGH RISK
+                            </span>
+
+                        {% elif scan.risk_level == "POTENTIAL RISK" %}
+
+                            <span class="risk-badge risk-medium">
+                                POTENTIAL RISK
+                            </span>
+
+                        {% elif scan.risk_level == "LOW" %}
+
+                            <span class="risk-badge risk-low">
+                                LOW
+                            </span>
+
+                        {% else %}
+
+                            <span class="risk-badge">
+                                {{ scan.risk_level }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ scan.created_at.strftime(
+                            '%d %b %Y, %I:%M %p'
+                        ) }}
+                    </td>
+
+                    <td>
+                        <button
+                            class="view-result-button"
+                            onclick="
+                                document
+                                .getElementById(
+                                    'result-{{ scan.id }}'
+                                )
+                                .showModal()
+                            "
+                        >
+                            View Result
+                        </button>
+                    </td>
+
+                </tr>
+
+
+                <dialog
+                    id="result-{{ scan.id }}"
+                    class="result-modal"
+                >
+
+                    <div class="result-modal-content">
+
+                        <div class="modal-header">
+
+                            <div>
+                                <p class="eyebrow">SCAN RESULT</p>
+                                <h2>Result Details</h2>
+                            </div>
+
+                            <button
+                                class="modal-close"
+                                onclick="
+                                    document
+                                    .getElementById(
+                                        'result-{{ scan.id }}'
+                                    )
+                                    .close()
+                                "
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+
+                        <div class="modal-grid">
+
+                            <div class="modal-summary">
+
+                                <p class="modal-label">
+                                    TYPE
+                                </p>
+
+                                <p>
+                                    {{ scan.scan_type | capitalize }}
+                                </p>
+
+
+                                <p class="modal-label">
+                                    ITEM
+                                </p>
+
+                                <p>
+                                    {{ scan.input_value }}
+                                </p>
+
+
+                                <p class="modal-label">
+                                    RISK LEVEL
+                                </p>
+
+                                <p>
+                                    {{ scan.risk_level }}
+                                </p>
+
+
+                                <p class="modal-label">
+                                    SCANNED
+                                </p>
+
+                                <p>
+                                    {{ scan.created_at.strftime(
+                                        '%d %b %Y, %I:%M %p'
+                                    ) }}
+                                </p>
+
+                            </div>
+
+
+                            <div class="modal-analysis">
+
+                                {% if scan.indicators_list %}
+
+                                    <p class="modal-label">
+                                        SUSPICIOUS INDICATORS
+                                    </p>
+
+                                    <ul>
+
+                                    {% for indicator in scan.indicators_list %}
+
+                                        <li>
+                                            {{ indicator }}
+                                        </li>
+
+                                    {% endfor %}
+
+                                    </ul>
+
+                                {% endif %}
+
+
+                                <p class="modal-label">
+                                    EXPLANATION
+                                </p>
+
+                                <p>
+                                    {{ scan.result_summary }}
+                                </p>
+
+
+                                <p class="modal-label">
+                                    RECOMMENDED ACTION
+                                </p>
+
+                                <p>
+                                    {{ scan.recommended_action }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="modal-footer">
+
+                            <button
+                                class="view-result-button"
+                                onclick="
+                                    document
+                                    .getElementById(
+                                        'result-{{ scan.id }}'
+                                    )
+                                    .close()
+                                "
+                            >
+                                Close
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </dialog>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <h3>No scan history yet</h3>
+
+            <p class="muted">
+                Complete a scan and it will appear here.
+            </p>
+
+            <a href="{{ url_for('home') }}" class="nav-button">
+                Start a Scan
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}

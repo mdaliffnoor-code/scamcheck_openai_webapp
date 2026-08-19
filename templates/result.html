@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Risk Assessment | ScamCheck{% endblock %}
+{% block content %}
+<section class="page-section"><div class="shell narrow">
+<p class="eyebrow">RISK ASSESSMENT</p><h1>ScamCheck Result</h1>
+<div class="result-card">
+<div class="result-row"><span>Check Type</span><strong>{{ result.type }}</strong></div>
+<div class="result-row"><span>Submitted</span><strong>{{ result.value }}</strong></div>
+<div class="result-risk"><span>Risk Level</span><strong>{{ result.risk }}</strong></div>
+<div class="result-section"><h3>Assessment</h3><p class="result-summary">{{ result.summary }}</p></div>
+<div class="result-section"><h3>Recommended Action</h3><p>{{ result.recommendation }}</p></div>
+</div>
+<div class="result-links"><a class="outline-link" href="{{ url_for('home') }}">← Run another check</a><a class="outline-link" href="{{ url_for('resources') }}">View scam resources →</a></div>
+</div></section>
+{% endblock %}
