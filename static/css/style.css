@@ -1433,3 +1433,33 @@ html[data-theme="dark"] .footer-brand { color: var(--gold); }
     padding: 7px 10px;
     border-radius: 7px;
 }
+
+/* =========================================
+   SCAN ACTIVITY FILTERS
+========================================= */
+
+.table-filter-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.table-filter-header input,
+.table-filter-header select {
+    width: 100%;
+    min-width: 120px;
+
+    padding: 7px 9px;
+
+    border: 1px solid #6b7280;
+    border-radius: 6px;
+
+    background: var(--panel);
+    color: var(--text);
+
+    font-size: 0.78rem;
+}
+
+.table-filter-header input::placeholder {
+    color: var(--muted);
+}

@@ -107,3 +107,182 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+// =========================================
+// ADMIN SCAN ACTIVITY FILTERING
+// =========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const userFilter =
+        document.getElementById("filterUser");
+
+    const typeFilter =
+        document.getElementById("filterScanType");
+
+    const riskFilter =
+        document.getElementById("filterRisk");
+
+    const dateSort =
+        document.getElementById("sortDate");
+
+    const tableBody =
+        document.getElementById("activityTableBody");
+
+
+    if (!tableBody) {
+        return;
+    }
+
+
+    function updateTable() {
+
+        const rows = Array.from(
+            tableBody.querySelectorAll("tr")
+        );
+
+
+        const userValue =
+            userFilter
+                ? userFilter.value
+                    .toLowerCase()
+                    .trim()
+                : "";
+
+        const typeValue =
+            typeFilter
+                ? typeFilter.value.toLowerCase()
+                : "";
+
+        const riskValue =
+            riskFilter
+                ? riskFilter.value
+                : "";
+
+
+        // FILTER ROWS
+
+        rows.forEach(function (row) {
+
+            const rowUser =
+                row.dataset.user || "";
+
+            const rowType =
+                row.dataset.type || "";
+
+            const rowRisk =
+                row.dataset.risk || "";
+
+
+            const userMatches =
+                !userValue
+                || rowUser.includes(userValue);
+
+            const typeMatches =
+                !typeValue
+                || rowType === typeValue;
+
+            const riskMatches =
+                !riskValue
+                || rowRisk === riskValue;
+
+
+            if (
+                userMatches
+                && typeMatches
+                && riskMatches
+            ) {
+
+                row.style.display = "";
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+
+        // SORT DATE
+
+        rows.sort(function (a, b) {
+
+            const dateA =
+                Number(a.dataset.date);
+
+            const dateB =
+                Number(b.dataset.date);
+
+
+            if (
+                dateSort
+                && dateSort.value === "earliest"
+            ) {
+
+                return dateA - dateB;
+
+            }
+
+            // DEFAULT:
+            // LATEST → EARLIEST
+
+            return dateB - dateA;
+
+        });
+
+
+        rows.forEach(function (row) {
+
+            tableBody.appendChild(row);
+
+        });
+
+    }
+
+
+    if (userFilter) {
+
+        userFilter.addEventListener(
+            "input",
+            updateTable
+        );
+
+    }
+
+
+    if (typeFilter) {
+
+        typeFilter.addEventListener(
+            "change",
+            updateTable
+        );
+
+    }
+
+
+    if (riskFilter) {
+
+        riskFilter.addEventListener(
+            "change",
+            updateTable
+        );
+
+    }
+
+
+    if (dateSort) {
+
+        dateSort.addEventListener(
+            "change",
+            updateTable
+        );
+
+    }
+
+
+    // Apply default sorting when page loads
+
+    updateTable();
+
+});

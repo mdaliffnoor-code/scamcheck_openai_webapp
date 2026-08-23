@@ -118,6 +118,11 @@ class ScanHistory(db.Model):
         nullable=False
     )
 
+    user = db.relationship(
+    "User",
+    backref="scans"
+    )
+
     scan_type = db.Column(
         db.String(30),
         nullable=False
@@ -2192,6 +2197,34 @@ def admin_update_user_role(user_id):
 
     return redirect(
         url_for("admin_users")
+    )
+
+@app.route("/admin/activity")
+@login_required
+def admin_activity():
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+    scans = (
+        ScanHistory.query
+        .order_by(
+            ScanHistory.created_at.desc()
+        )
+        .all()
+    )
+
+    return render_template(
+        "admin_activity.html",
+        scans=scans
     )
 
 @app.route("/logout")

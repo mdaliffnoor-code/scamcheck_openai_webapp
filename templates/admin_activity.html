@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}
+Scan Activity | ScamCheck
+{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            ADMINISTRATION
+        </p>
+
+        <h1>
+            Scan Activity
+        </h1>
+
+        <p class="page-intro">
+            Review phone number, URL, and screenshot scans
+            performed across ScamCheck.
+        </p>
+
+
+        <div class="admin-card">
+
+            <span>
+                PLATFORM ACTIVITY
+            </span>
+
+            <h3>
+                Scan History
+            </h3>
+
+
+            {% if scans %}
+
+                <div class="admin-table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <!-- USER FILTER -->
+
+                                <th>
+
+                                    <div class="table-filter-header">
+
+                                        <span>User</span>
+
+                                        <input
+                                            type="text"
+                                            id="filterUser"
+                                            placeholder="Filter user..."
+                                        >
+
+                                    </div>
+
+                                </th>
+
+
+                                <!-- SCAN TYPE FILTER -->
+
+                                <th>
+
+                                    <div class="table-filter-header">
+
+                                        <span>Scan Type</span>
+
+                                        <select id="filterScanType">
+
+                                            <option value="">
+                                                All
+                                            </option>
+
+                                            <option value="phone">
+                                                Phone
+                                            </option>
+
+                                            <option value="url">
+                                                URL
+                                            </option>
+
+                                            <option value="screenshot">
+                                                Screenshot
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                </th>
+
+
+                                <!-- NO FILTER -->
+
+                                <th>
+                                    Input
+                                </th>
+
+
+                                <!-- RISK FILTER -->
+
+                                <th>
+
+                                    <div class="table-filter-header">
+
+                                        <span>Risk Level</span>
+
+                                        <select id="filterRisk">
+
+                                            <option value="">
+                                                All
+                                            </option>
+
+                                            <option value="LOW">
+                                                Low
+                                            </option>
+
+                                            <option value="POTENTIAL RISK">
+                                                Potential Risk
+                                            </option>
+
+                                            <option value="HIGH RISK">
+                                                High Risk
+                                            </option>
+
+                                            <option value="UNKNOWN">
+                                                Unknown
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                </th>
+
+
+                                <!-- DATE SORT -->
+
+                                <th>
+
+                                    <div class="table-filter-header">
+
+                                        <span>Date</span>
+
+                                        <select id="sortDate">
+
+                                            <option
+                                                value="latest"
+                                                selected
+                                            >
+                                                Latest → Earliest
+                                            </option>
+
+                                            <option value="earliest">
+                                                Earliest → Latest
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="activityTableBody">
+
+                            {% for scan in scans %}
+
+                                <tr
+                                    data-user="{{ scan.user.username | lower }}"
+                                    data-type="{{ scan.scan_type | lower }}"
+                                    data-risk="{{ scan.risk_level }}"
+                                    data-date="{{ scan.created_at.timestamp() }}"
+                                >
+
+                                    <td>
+                                        {{ scan.user.username }}
+                                    </td>
+
+                                    <td>
+                                        {{ scan.scan_type | capitalize }}
+                                    </td>
+
+                                    <td>
+                                        {{ scan.input_value }}
+                                    </td>
+
+                                    <td>
+                                        {{ scan.risk_level }}
+                                    </td>
+
+                                    <td>
+                                        {{ scan.created_at.strftime("%d %b %Y %H:%M") }}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+                <p class="muted">
+                    No scan activity found.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <div style="margin-top: 25px;">
+
+            <a
+                href="{{ url_for('admin') }}"
+                class="outline-link"
+            >
+                ← Back to Admin Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
