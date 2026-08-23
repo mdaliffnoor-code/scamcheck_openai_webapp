@@ -489,8 +489,12 @@ def analyse_phone_number(phone_number):
 
         return {
             "source": "internal_database",
-            "phone_number": normalized_phone,
-            "risk_level": flagged_number.risk_level,
+
+            "phone_number":
+                normalized_phone,
+
+            "risk_level":
+                flagged_number.risk_level,
 
             "suspicious_indicators": [
                 "Number found in ScamCheck flagged-number database"
@@ -506,7 +510,8 @@ def analyse_phone_number(phone_number):
                 "until the caller has been independently verified.",
 
             "details": {
-                "reported_source": flagged_number.source
+                "reported_source":
+                    flagged_number.source
             }
         }
 
@@ -528,8 +533,12 @@ def analyse_phone_number(phone_number):
 
         return {
             "source": "abstract_api",
-            "phone_number": normalized_phone,
-            "risk_level": "UNKNOWN",
+
+            "phone_number":
+                normalized_phone,
+
+            "risk_level":
+                "UNKNOWN",
 
             "suspicious_indicators": [],
 
@@ -545,27 +554,27 @@ def analyse_phone_number(phone_number):
 
 
     # =====================================
-    # 6. EXTRACT ABSTRACT DATA
+    # 6. EXTRACT ABSTRACT DATA SAFELY
     # =====================================
 
-    validation = api_result.get(
-        "phone_validation",
-        {}
+    validation = (
+        api_result.get("phone_validation")
+        or {}
     )
 
-    risk = api_result.get(
-        "phone_risk",
-        {}
+    risk = (
+        api_result.get("phone_risk")
+        or {}
     )
 
-    carrier = api_result.get(
-        "phone_carrier",
-        {}
+    carrier = (
+        api_result.get("phone_carrier")
+        or {}
     )
 
-    location = api_result.get(
-        "phone_location",
-        {}
+    location = (
+        api_result.get("phone_location")
+        or {}
     )
 
 
@@ -575,14 +584,14 @@ def analyse_phone_number(phone_number):
     # =====================================
 
     abstract_risk = (
-        risk.get("risk_level", "")
-        .lower()
-    )
+        risk.get("risk_level")
+        or ""
+    ).strip().lower()
 
 
     if (
         abstract_risk == "high"
-        or risk.get("is_abuse_detected", False)
+        or risk.get("is_abuse_detected") is True
     ):
 
         scamcheck_risk = "HIGH RISK"
@@ -590,15 +599,20 @@ def analyse_phone_number(phone_number):
 
     elif (
         abstract_risk == "medium"
-        or risk.get("is_disposable", False)
+        or risk.get("is_disposable") is True
     ):
 
         scamcheck_risk = "POTENTIAL RISK"
 
 
-    else:
+    elif abstract_risk == "low":
 
         scamcheck_risk = "LOW"
+
+
+    else:
+
+        scamcheck_risk = "UNKNOWN"
 
 
     # =====================================
@@ -608,21 +622,21 @@ def analyse_phone_number(phone_number):
     suspicious_indicators = []
 
 
-    if risk.get("is_abuse_detected", False):
+    if risk.get("is_abuse_detected") is True:
 
         suspicious_indicators.append(
             "Abuse has been detected for this number"
         )
 
 
-    if risk.get("is_disposable", False):
+    if risk.get("is_disposable") is True:
 
         suspicious_indicators.append(
             "Disposable phone number detected"
         )
 
 
-    if validation.get("is_voip", False):
+    if validation.get("is_voip") is True:
 
         suspicious_indicators.append(
             "This number uses a VoIP service"
@@ -641,7 +655,8 @@ def analyse_phone_number(phone_number):
     # =====================================
 
     return {
-        "source": "abstract_api",
+        "source":
+            "abstract_api",
 
         "phone_number":
             normalized_phone,
@@ -690,6 +705,7 @@ def analyse_phone_number(phone_number):
                 risk.get("is_abuse_detected")
         }
     }
+
 @app.context_processor
 def inject_psa_alerts():
     return {
