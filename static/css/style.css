@@ -1344,3 +1344,92 @@ html[data-theme="dark"] .footer-brand { color: var(--gold); }
 .bulletin-delete-button:hover {
     background: rgba(228, 125, 141, 0.1);
 }
+
+/* =========================================
+   ADMIN USER TABLE
+========================================= */
+
+.admin-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+
+    border: 1px solid #6b7280;
+    border-radius: 10px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+/* TABLE CELLS */
+
+.admin-table th,
+.admin-table td {
+    padding: 16px;
+    text-align: left;
+    vertical-align: middle;
+
+    /* Clearly visible borders */
+    border: 1px solid #6b7280;
+}
+
+
+/* TABLE HEADER */
+
+.admin-table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+
+    background: rgba(255, 255, 255, 0.06);
+}
+
+
+/* TABLE ROW */
+
+.admin-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+
+/* =========================================
+   ROLE BADGES
+========================================= */
+
+.user-role {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.user-role-admin {
+    background: rgba(228, 125, 141, 0.18);
+}
+
+.user-role-user {
+    background: rgba(100, 180, 255, 0.18);
+}
+
+
+/* =========================================
+   ROLE UPDATE FORM
+========================================= */
+
+.role-update-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.role-update-form select {
+    padding: 7px 10px;
+    border-radius: 7px;
+}

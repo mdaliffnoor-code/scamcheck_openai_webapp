@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}
+User Accounts | ScamCheck
+{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            ADMINISTRATION
+        </p>
+
+        <h1>
+            User Accounts
+        </h1>
+
+        <p class="page-intro">
+            Review registered ScamCheck users and their assigned roles.
+        </p>
+
+
+        <div class="admin-card">
+
+    <span>
+        REGISTERED USERS
+    </span>
+
+    <h3>
+        User Directory
+    </h3>
+
+
+    {% if users %}
+
+        <div class="admin-table-wrapper">
+
+            <table class="admin-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Registered Date</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for user in users %}
+
+                        <tr>
+
+                            <!-- USERNAME -->
+
+                            <td>
+                                <strong>
+                                    {{ user.username }}
+                                </strong>
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+                                {{ user.email }}
+                            </td>
+
+
+                            <!-- REGISTERED DATE -->
+
+                            <td>
+
+                                {% if user.created_at %}
+
+                                    {{ user.created_at.strftime("%d %b %Y") }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ROLE -->
+
+                            <td>
+
+                                <span class="user-role user-role-{{ user.role }}">
+                                    {{ user.role | capitalize }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- ACTION -->
+
+                            <td>
+
+                                {% if user.id == current_user.id %}
+
+                                    <span class="muted">
+                                        Current Account
+                                    </span>
+
+                                {% else %}
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'admin_update_user_role',
+                                            user_id=user.id
+                                        ) }}"
+                                        class="role-update-form"
+                                    >
+
+                                        <select
+                                            name="role"
+                                            required
+                                        >
+
+                                            <option
+                                                value="user"
+                                                {% if user.role == "user" %}
+                                                selected
+                                                {% endif %}
+                                            >
+                                                User
+                                            </option>
+
+                                            <option
+                                                value="admin"
+                                                {% if user.role == "admin" %}
+                                                selected
+                                                {% endif %}
+                                            >
+                                                Admin
+                                            </option>
+
+                                        </select>
+
+
+                                        <button
+                                            type="submit"
+                                            class="bulletin-toggle-button"
+                                        >
+                                            Update
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <p class="muted">
+            No registered users found.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+        <div style="margin-top: 25px;">
+
+            <a
+                href="{{ url_for('admin') }}"
+                class="outline-link"
+            >
+                ← Back to Admin Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

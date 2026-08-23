@@ -2067,6 +2067,133 @@ def admin_delete_phone_number(number_id):
         url_for("admin_phone_numbers")
     )
 
+@app.route("/admin/users")
+@login_required
+def admin_users():
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # GET ALL USERS
+    # =====================================
+
+    users = (
+        User.query
+        .order_by(
+            User.created_at.desc()
+        )
+        .all()
+    )
+
+
+    # =====================================
+    # RENDER USER MANAGEMENT PAGE
+    # =====================================
+
+    return render_template(
+        "admin_users.html",
+        users=users
+    )
+
+@app.route(
+    "/admin/users/<int:user_id>/role",
+    methods=["POST"]
+)
+@login_required
+def admin_update_user_role(user_id):
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    user = db.session.get(
+        User,
+        user_id
+    )
+
+
+    if not user:
+
+        flash(
+            "User not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_users")
+        )
+
+
+    new_role = request.form.get(
+        "role",
+        ""
+    ).strip()
+
+
+    if new_role not in ["user", "admin"]:
+
+        flash(
+            "Invalid role selected.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_users")
+        )
+
+
+    # Prevent the currently logged-in admin
+    # from removing their own admin access
+
+    if user.id == current_user.id and new_role != "admin":
+
+        flash(
+            "You cannot remove your own administrator role.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_users")
+        )
+
+
+    user.role = new_role
+
+    db.session.commit()
+
+
+    flash(
+        f"{user.username}'s role was updated to {new_role}.",
+        "success"
+    )
+
+
+    return redirect(
+        url_for("admin_users")
+    )
+
 @app.route("/logout")
 @login_required
 def logout():

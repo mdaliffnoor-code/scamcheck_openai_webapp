@@ -80,22 +80,27 @@ Admin Dashboard | ScamCheck
 
             <!-- USER ACCOUNTS -->
 
-            <div class="admin-card">
+            <a
+                href="{{ url_for('admin_users') }}"
+                class="admin-card admin-card-active"
+            >
 
                 <span>03</span>
 
-                <h3>User Accounts</h3>
+                <h3>
+                    User Accounts
+                </h3>
 
                 <p>
-                    Review registered users and manage
-                    account roles and access permissions.
+                    Review registered accounts and manage
+                    user roles and access permissions.
                 </p>
 
-                <div class="admin-card-action admin-coming-soon">
-                    Coming Soon
+                <div class="admin-card-action">
+                    Manage Users →
                 </div>
 
-            </div>
+            </a>
 
 
             <!-- SCAN ACTIVITY -->
