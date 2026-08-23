@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Flagged Number | ScamCheck
+{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="shell narrow">
+
+        <p class="eyebrow">
+            ADMINISTRATION
+        </p>
+
+        <h1>
+            Edit Flagged Number
+        </h1>
+
+        <div class="admin-card">
+
+            <form
+                method="POST"
+                class="auth-form"
+            >
+
+                <label for="phone_number">
+                    Phone Number
+                </label>
+
+                <input
+                    type="text"
+                    id="phone_number"
+                    name="phone_number"
+                    value="{{ number.phone_number }}"
+                    required
+                >
+
+
+                <label for="risk_level">
+                    Risk Level
+                </label>
+
+                <select
+                    id="risk_level"
+                    name="risk_level"
+                    required
+                >
+
+                    <option
+                        value="HIGH RISK"
+                        {% if number.risk_level == "HIGH RISK" %}
+                        selected
+                        {% endif %}
+                    >
+                        High Risk
+                    </option>
+
+                    <option
+                        value="POTENTIAL RISK"
+                        {% if number.risk_level == "POTENTIAL RISK" %}
+                        selected
+                        {% endif %}
+                    >
+                        Potential Risk
+                    </option>
+
+                    <option
+                        value="LOW"
+                        {% if number.risk_level == "LOW" %}
+                        selected
+                        {% endif %}
+                    >
+                        Low
+                    </option>
+
+                </select>
+
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                >{{ number.description or "" }}</textarea>
+
+
+                <label for="source">
+                    Source
+                </label>
+
+                <input
+                    type="text"
+                    id="source"
+                    name="source"
+                    value="{{ number.source or '' }}"
+                >
+
+
+                <button type="submit">
+                    Save Changes
+                </button>
+
+            </form>
+
+        </div>
+
+        <div style="margin-top: 25px;">
+
+            <a
+                href="{{ url_for('admin_phone_numbers') }}"
+                class="outline-link"
+            >
+                ← Back to Flagged Numbers
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

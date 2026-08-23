@@ -35,7 +35,10 @@ Admin Dashboard | ScamCheck
 
             <!-- FLAGGED PHONE NUMBERS -->
 
-            <div class="admin-card">
+            <a
+                href="{{ url_for('admin_phone_numbers') }}"
+                class="admin-card admin-card-active"
+            >
 
                 <span>01</span>
 
@@ -46,12 +49,11 @@ Admin Dashboard | ScamCheck
                     flagged for suspicious or scam-related activity.
                 </p>
 
-                <div class="admin-card-action admin-coming-soon">
-                    Coming Soon
+                <div class="admin-card-action">
+                    Manage Numbers →
                 </div>
 
-            </div>
-
+            </a>
 
             <!-- SCAM BULLETINS -->
 
