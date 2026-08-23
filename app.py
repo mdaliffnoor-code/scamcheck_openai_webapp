@@ -4,12 +4,14 @@ import uuid
 import requests
 import json
 
-from flask import Flask, json, render_template, request, redirect, url_for, flash
+from flask import Flask, json, render_template, request, redirect, url_for, flash, send_file
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 
 from dotenv import load_dotenv
+from io import BytesIO
+
 
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient, ContentSettings
@@ -201,6 +203,47 @@ class FlaggedPhoneNumber(db.Model):
         default=datetime.utcnow
     )
 
+class Bulletin(db.Model):
+
+    __tablename__ = "bulletins"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    title = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    blob_name = db.Column(
+        db.String(500),
+        nullable=False
+    )
+
+    publication_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    is_published = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
 #user loader callback for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
@@ -219,6 +262,11 @@ AZURE_STORAGE_ACCOUNT_URL = os.getenv(
 AZURE_STORAGE_CONTAINER = os.getenv(
     "AZURE_STORAGE_CONTAINER",
     "screenshots"
+)
+
+AZURE_BULLETIN_CONTAINER = os.getenv(
+    "AZURE_BULLETIN_CONTAINER",
+    "bulletins"
 )
 
 GOOGLE_SAFE_BROWSING_API_KEY = os.getenv(
@@ -322,6 +370,34 @@ def upload_to_blob(file_bytes, filename, content_type):
     blob_client = blob_service_client.get_blob_client(
         container=AZURE_STORAGE_CONTAINER,
         blob=unique_filename
+    )
+
+    blob_client.upload_blob(
+        file_bytes,
+        overwrite=False,
+        content_settings=ContentSettings(
+            content_type=content_type
+        )
+    )
+
+    return unique_filename
+
+def upload_bulletin_to_blob(
+    file_bytes,
+    filename,
+    content_type
+):
+
+    unique_filename = (
+        f"{uuid.uuid4()}-{filename}"
+    )
+
+    blob_client = (
+        blob_service_client
+        .get_blob_client(
+            container=AZURE_BULLETIN_CONTAINER,
+            blob=unique_filename
+        )
     )
 
     blob_client.upload_blob(
@@ -1068,10 +1144,124 @@ def check_screenshot():
     )
 
 
-@app.route('/resources')
+@app.route("/resources")
 def resources():
-    return render_template('resources.html')
 
+    bulletins = (
+        Bulletin.query
+        .filter_by(is_published=True)
+        .order_by(
+            Bulletin.publication_date.desc()
+        )
+        .all()
+    )
+
+    current_bulletin = (
+        bulletins[0]
+        if bulletins
+        else None
+    )
+
+    previous_bulletins = (
+        bulletins[1:]
+        if len(bulletins) > 1
+        else []
+    )
+
+    return render_template(
+        "resources.html",
+        current_bulletin=current_bulletin,
+        previous_bulletins=previous_bulletins
+    )
+
+@app.route("/resources/bulletin/<int:bulletin_id>")
+def view_bulletin(bulletin_id):
+
+    # =====================================
+    # FIND BULLETIN IN DATABASE
+    # =====================================
+
+    bulletin = db.session.get(
+        Bulletin,
+        bulletin_id
+    )
+
+    if not bulletin:
+
+        flash(
+            "Bulletin not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("resources")
+        )
+
+
+    # =====================================
+    # ONLY ALLOW PUBLISHED BULLETINS
+    # =====================================
+
+    if not bulletin.is_published:
+
+        flash(
+            "This bulletin is not currently available.",
+            "error"
+        )
+
+        return redirect(
+            url_for("resources")
+        )
+
+
+    # =====================================
+    # GET PDF FROM AZURE BLOB STORAGE
+    # =====================================
+
+    blob_client = (
+        blob_service_client
+        .get_blob_client(
+            container=AZURE_BULLETIN_CONTAINER,
+            blob=bulletin.blob_name
+        )
+    )
+
+
+    try:
+
+        pdf_bytes = (
+            blob_client
+            .download_blob()
+            .readall()
+        )
+
+    except Exception as error:
+
+        print(
+            "Bulletin download error:",
+            error
+        )
+
+        flash(
+            "The bulletin could not be loaded.",
+            "error"
+        )
+
+        return redirect(
+            url_for("resources")
+        )
+
+
+    # =====================================
+    # SEND PDF TO BROWSER
+    # =====================================
+
+    return send_file(
+        BytesIO(pdf_bytes),
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=f"{bulletin.title}.pdf"
+    )
 
 @app.route("/history")
 @login_required
@@ -1157,9 +1347,434 @@ def register():
     return render_template("register.html")
 
 
-@app.route('/admin')
+@app.route("/admin")
+@login_required
 def admin():
-    return render_template('admin.html')
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # GET BULLETINS
+    # =====================================
+
+    bulletins = (
+        Bulletin.query
+        .order_by(
+            Bulletin.publication_date.desc()
+        )
+        .all()
+    )
+
+
+    # =====================================
+    # RENDER ADMIN DASHBOARD
+    # =====================================
+
+    return render_template(
+        "admin.html",
+        bulletins=bulletins
+    )
+
+@app.route("/admin/bulletins")
+@login_required
+def admin_bulletins():
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # GET ALL BULLETINS
+    # =====================================
+
+    bulletins = (
+        Bulletin.query
+        .order_by(
+            Bulletin.publication_date.desc()
+        )
+        .all()
+    )
+
+
+    # =====================================
+    # RENDER BULLETIN MANAGEMENT PAGE
+    # =====================================
+
+    return render_template(
+        "admin_bulletins.html",
+        bulletins=bulletins
+    )
+
+
+@app.route(
+    "/admin/bulletins/add",
+    methods=["POST"]
+)
+@login_required
+def admin_add_bulletin():
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # GET FORM DATA
+    # =====================================
+
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
+
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
+
+    publication_date_text = request.form.get(
+        "publication_date",
+        ""
+    )
+
+    file = request.files.get(
+        "bulletin_file"
+    )
+
+
+    # =====================================
+    # VALIDATE TITLE
+    # =====================================
+
+    if not title:
+
+        flash(
+            "Bulletin title is required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    # =====================================
+    # VALIDATE PUBLICATION DATE
+    # =====================================
+
+    if not publication_date_text:
+
+        flash(
+            "Publication date is required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    # =====================================
+    # VALIDATE FILE
+    # =====================================
+
+    if not file or file.filename == "":
+
+        flash(
+            "Please select a PDF file.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    if not file.filename.lower().endswith(".pdf"):
+
+        flash(
+            "Only PDF files are allowed.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    # =====================================
+    # CONVERT PUBLICATION DATE
+    # =====================================
+
+    publication_date = datetime.strptime(
+        publication_date_text,
+        "%Y-%m-%d"
+    ).date()
+
+
+    # =====================================
+    # PREPARE PDF
+    # =====================================
+
+    filename = secure_filename(
+        file.filename
+    )
+
+    file_bytes = file.read()
+
+
+    # =====================================
+    # UPLOAD PDF TO AZURE BLOB STORAGE
+    # =====================================
+
+    blob_name = upload_bulletin_to_blob(
+        file_bytes=file_bytes,
+        filename=filename,
+        content_type="application/pdf"
+    )
+
+
+    # =====================================
+    # SAVE BULLETIN METADATA TO DATABASE
+    # =====================================
+
+    bulletin = Bulletin(
+        title=title,
+        description=description,
+        blob_name=blob_name,
+        publication_date=publication_date,
+        is_published=True
+    )
+
+    db.session.add(
+        bulletin
+    )
+
+    db.session.commit()
+
+
+    # =====================================
+    # SUCCESS
+    # =====================================
+
+    flash(
+        "Bulletin uploaded successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for("admin_bulletins")
+    )
+
+@app.route(
+    "/admin/bulletins/<int:bulletin_id>/toggle",
+    methods=["POST"]
+)
+@login_required
+def admin_toggle_bulletin(bulletin_id):
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # FIND BULLETIN
+    # =====================================
+
+    bulletin = db.session.get(
+        Bulletin,
+        bulletin_id
+    )
+
+    if not bulletin:
+
+        flash(
+            "Bulletin not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    # =====================================
+    # TOGGLE PUBLISH STATUS
+    # =====================================
+
+    bulletin.is_published = not bulletin.is_published
+
+    db.session.commit()
+
+
+    # =====================================
+    # SUCCESS MESSAGE
+    # =====================================
+
+    if bulletin.is_published:
+
+        flash(
+            "Bulletin published successfully.",
+            "success"
+        )
+
+    else:
+
+        flash(
+            "Bulletin hidden successfully.",
+            "success"
+        )
+
+
+    return redirect(
+        url_for("admin_bulletins")
+    )
+
+@app.route(
+    "/admin/bulletins/<int:bulletin_id>/delete",
+    methods=["POST"]
+)
+@login_required
+def admin_delete_bulletin(bulletin_id):
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # FIND BULLETIN
+    # =====================================
+
+    bulletin = db.session.get(
+        Bulletin,
+        bulletin_id
+    )
+
+    if not bulletin:
+
+        flash(
+            "Bulletin not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    # =====================================
+    # DELETE PDF FROM AZURE BLOB STORAGE
+    # =====================================
+
+    blob_client = (
+        blob_service_client
+        .get_blob_client(
+            container=AZURE_BULLETIN_CONTAINER,
+            blob=bulletin.blob_name
+        )
+    )
+
+    try:
+
+        blob_client.delete_blob()
+
+    except Exception as error:
+
+        print(
+            "Bulletin blob deletion error:",
+            error
+        )
+
+        flash(
+            "The bulletin PDF could not be deleted from storage.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_bulletins")
+        )
+
+
+    # =====================================
+    # DELETE DATABASE RECORD
+    # =====================================
+
+    db.session.delete(
+        bulletin
+    )
+
+    db.session.commit()
+
+
+    flash(
+        "Bulletin deleted successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for("admin_bulletins")
+    )
 
 @app.route("/logout")
 @login_required

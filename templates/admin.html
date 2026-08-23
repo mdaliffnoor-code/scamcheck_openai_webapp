@@ -1,9 +1,143 @@
 {% extends "base.html" %}
-{% block title %}Admin | ScamCheck{% endblock %}
+
+{% block title %}
+Admin Dashboard | ScamCheck
+{% endblock %}
+
 {% block content %}
-<section class="page-section"><div class="shell"><p class="eyebrow">ADMINISTRATION</p><h1>Admin Dashboard</h1><div class="admin-grid">
-<div class="admin-card"><span>01</span><h3>Manage Users</h3><p>Review user accounts and role assignments.</p></div>
-<div class="admin-card"><span>02</span><h3>Manage Reports</h3><p>Review submitted scam reports and update their status.</p></div>
-<div class="admin-card"><span>03</span><h3>Manage Bulletins</h3><p>Upload or remove scam-awareness PDFs stored in Blob Storage.</p></div>
-</div></div></section>
+
+<section class="page-section">
+
+    <div class="shell">
+
+        <!-- =========================================
+             ADMIN HEADER
+             ========================================= -->
+
+        <p class="eyebrow">
+            ADMINISTRATION
+        </p>
+
+        <h1>Admin Dashboard</h1>
+
+        <p class="page-intro">
+            Manage ScamCheck records, scam-awareness resources,
+            users, and platform activity.
+        </p>
+
+
+        <!-- =========================================
+             ADMIN DASHBOARD
+             ========================================= -->
+
+        <div class="admin-grid">
+
+
+            <!-- FLAGGED PHONE NUMBERS -->
+
+            <div class="admin-card">
+
+                <span>01</span>
+
+                <h3>Flagged Numbers</h3>
+
+                <p>
+                    Add, review, edit, or remove phone numbers
+                    flagged for suspicious or scam-related activity.
+                </p>
+
+                <div class="admin-card-action admin-coming-soon">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- SCAM BULLETINS -->
+
+            <a
+                href="{{ url_for('admin_bulletins') }}"
+                class="admin-card admin-card-active"
+            >
+
+                <span>02</span>
+
+                <h3>Scam Bulletins</h3>
+
+                <p>
+                    Upload and manage monthly scam-awareness
+                    bulletins stored securely in Azure Blob Storage.
+                </p>
+
+                <div class="admin-card-action">
+                    Manage Bulletins →
+                </div>
+
+            </a>
+
+
+            <!-- USER ACCOUNTS -->
+
+            <div class="admin-card">
+
+                <span>03</span>
+
+                <h3>User Accounts</h3>
+
+                <p>
+                    Review registered users and manage
+                    account roles and access permissions.
+                </p>
+
+                <div class="admin-card-action admin-coming-soon">
+                    Coming Soon
+                </div>
+
+            </div>
+
+
+            <!-- SCAN ACTIVITY -->
+
+            <div class="admin-card">
+
+                <span>04</span>
+
+                <h3>Scan Activity</h3>
+
+                <p>
+                    Review recent phone number, URL,
+                    and screenshot scans across ScamCheck.
+                </p>
+
+                <div class="admin-card-action admin-coming-soon">
+                    Coming Soon
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             ADMIN INFORMATION
+             ========================================= -->
+
+        <div class="admin-card admin-note">
+
+            <span>ADMIN ACCESS</span>
+
+            <h3>Operational Control</h3>
+
+            <p>
+                Administrative changes can affect information
+                presented to ScamCheck users. Review records
+                carefully before publishing or modifying them.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
 {% endblock %}

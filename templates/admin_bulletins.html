@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}
+Manage Bulletins | ScamCheck
+{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            ADMINISTRATION
+        </p>
+
+        <h1>
+            Manage Scam Bulletins
+        </h1>
+
+        <p class="page-intro">
+            Upload and manage monthly scam-awareness bulletins.
+        </p>
+
+
+        <!-- =====================================
+             UPLOAD FORM
+             ===================================== -->
+
+        <div class="admin-card">
+
+            <span>
+                UPLOAD BULLETIN
+            </span>
+
+            <h3>
+                Add New Bulletin
+            </h3>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_add_bulletin') }}"
+                enctype="multipart/form-data"
+                class="auth-form"
+            >
+
+                <label for="title">
+                    Bulletin Title
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="e.g. August 2026 Scam Bulletin"
+                    required
+                >
+
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    placeholder="Brief description of this month's bulletin"
+                ></textarea>
+
+
+                <label for="publication_date">
+                    Publication Date
+                </label>
+
+                <input
+                    type="date"
+                    id="publication_date"
+                    name="publication_date"
+                    required
+                >
+
+
+                <label for="bulletin_file">
+                    Bulletin PDF
+                </label>
+
+                <input
+                    type="file"
+                    id="bulletin_file"
+                    name="bulletin_file"
+                    accept=".pdf,application/pdf"
+                    required
+                >
+
+
+                <button type="submit">
+                    Upload Bulletin
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================
+             EXISTING BULLETINS
+             ===================================== -->
+
+        <div
+            class="admin-card"
+            style="margin-top: 30px;"
+        >
+
+            <span>
+                BULLETIN LIBRARY
+            </span>
+
+            <h3>
+                Existing Bulletins
+            </h3>
+
+
+            {% if bulletins %}
+
+                {% for bulletin in bulletins %}
+
+                    <div class="result-row">
+
+                        <!-- BULLETIN DETAILS -->
+
+                        <div>
+
+                            <strong>
+                                {{ bulletin.title }}
+                            </strong>
+
+                            <p class="muted">
+                                {{ bulletin.publication_date.strftime("%B %Y") }}
+                            </p>
+
+
+                            {% if bulletin.description %}
+
+                                <p class="muted">
+                                    {{ bulletin.description }}
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- BULLETIN ACTIONS -->
+
+                        <div class="bulletin-admin-actions">
+
+
+                            <!-- STATUS -->
+
+                            {% if bulletin.is_published %}
+
+                                <span class="bulletin-status published">
+                                    Published
+                                </span>
+
+                            {% else %}
+
+                                <span class="bulletin-status hidden">
+                                    Hidden
+                                </span>
+
+                            {% endif %}
+
+
+                            <!-- PUBLISH / HIDE BUTTON -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'admin_toggle_bulletin',
+                                    bulletin_id=bulletin.id
+                                ) }}"
+                            >
+
+                                {% if bulletin.is_published %}
+
+                                    <button
+                                        type="submit"
+                                        class="bulletin-toggle-button"
+                                    >
+                                        Hide
+                                    </button>
+
+                                {% else %}
+
+                                    <button
+                                        type="submit"
+                                        class="bulletin-toggle-button"
+                                    >
+                                        Publish
+                                    </button>
+
+                                {% endif %}
+
+                            </form>
+
+                            <!-- DELETE BUTTON -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'admin_delete_bulletin',
+                                    bulletin_id=bulletin.id
+                                ) }}"
+                                onsubmit="return confirm(
+                                    'Are you sure you want to permanently delete this bulletin?'
+                                );"
+                            >
+                                <button
+                                    type="submit"
+                                    class="bulletin-delete-button"
+                                >
+                                    Delete
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <p class="muted">
+                    No bulletins have been uploaded yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================
+             BACK TO ADMIN
+             ===================================== -->
+
+        <div style="margin-top: 25px;">
+
+            <a
+                href="{{ url_for('admin') }}"
+                class="outline-link"
+            >
+                ← Back to Admin Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
