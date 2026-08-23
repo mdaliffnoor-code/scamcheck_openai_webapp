@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}
+Flagged Numbers | ScamCheck
+{% endblock %}
+
+{% block content %}
+
+<section class="page-section">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            ADMINISTRATION
+        </p>
+
+        <h1>
+            Flagged Phone Numbers
+        </h1>
+
+        <p class="page-intro">
+            Manage phone numbers identified as suspicious
+            or associated with scam activity.
+        </p>
+
+
+        <!-- =====================================
+             ADD FLAGGED NUMBER
+             ===================================== -->
+
+        <div class="admin-card">
+
+            <span>
+                ADD FLAGGED NUMBER
+            </span>
+
+            <h3>
+                Add New Record
+            </h3>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_add_phone_number') }}"
+                class="auth-form"
+            >
+
+                <label for="phone_number">
+                    Phone Number
+                </label>
+
+                <input
+                    type="text"
+                    id="phone_number"
+                    name="phone_number"
+                    placeholder="+6591234567"
+                    required
+                >
+
+
+                <label for="risk_level">
+                    Risk Level
+                </label>
+
+                <select
+                    id="risk_level"
+                    name="risk_level"
+                    required
+                >
+
+                    <option value="HIGH RISK">
+                        High Risk
+                    </option>
+
+                    <option value="POTENTIAL RISK">
+                        Potential Risk
+                    </option>
+
+                    <option value="LOW">
+                        Low
+                    </option>
+
+                </select>
+
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    placeholder="Example: Reported impersonation scam requesting bank transfer."
+                ></textarea>
+
+
+                <label for="source">
+                    Source
+                </label>
+
+                <input
+                    type="text"
+                    id="source"
+                    name="source"
+                    placeholder="Example: ScamCheck Admin"
+                >
+
+
+                <button type="submit">
+                    Add Flagged Number
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================
+             EXISTING RECORDS
+             ===================================== -->
+
+        <div
+            class="admin-card"
+            style="margin-top: 30px;"
+        >
+
+            <span>
+                FLAGGED NUMBER DATABASE
+            </span>
+
+            <h3>
+                Existing Records
+            </h3>
+
+
+            {% if flagged_numbers %}
+
+                {% for number in flagged_numbers %}
+
+                    <div class="result-row">
+
+                        <!-- NUMBER DETAILS -->
+
+                        <div>
+
+                            <strong>
+                                {{ number.phone_number }}
+                            </strong>
+
+                            {% if number.description %}
+
+                                <p class="muted">
+                                    {{ number.description }}
+                                </p>
+
+                            {% endif %}
+
+
+                            {% if number.source %}
+
+                                <p class="muted">
+                                    Source: {{ number.source }}
+                                </p>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- NUMBER ACTIONS -->
+
+                        <div class="bulletin-admin-actions">
+
+                            <!-- RISK LEVEL -->
+
+                            <strong>
+                                {{ number.risk_level }}
+                            </strong>
+
+
+                            <!-- EDIT BUTTON -->
+
+                            <a
+                                href="{{ url_for(
+                                    'admin_edit_phone_number',
+                                    number_id=number.id
+                                ) }}"
+                                class="bulletin-toggle-button"
+                            >
+                                Edit
+                            </a>
+
+
+                            <!-- DELETE BUTTON -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'admin_delete_phone_number',
+                                    number_id=number.id
+                                ) }}"
+                                onsubmit="return confirm(
+                                    'Are you sure you want to permanently delete this phone number record?'
+                                );"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="bulletin-delete-button"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <p class="muted">
+                    No flagged phone numbers have been added yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================
+             BACK TO ADMIN
+             ===================================== -->
+
+        <div style="margin-top: 25px;">
+
+            <a
+                href="{{ url_for('admin') }}"
+                class="outline-link"
+            >
+                ← Back to Admin Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

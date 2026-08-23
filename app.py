@@ -1776,6 +1776,297 @@ def admin_delete_bulletin(bulletin_id):
         url_for("admin_bulletins")
     )
 
+@app.route("/admin/phone-numbers")
+@login_required
+def admin_phone_numbers():
+
+    # =====================================
+    # ADMIN ACCESS CHECK
+    # =====================================
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    # =====================================
+    # GET FLAGGED PHONE NUMBERS
+    # =====================================
+
+    flagged_numbers = (
+        FlaggedPhoneNumber.query
+        .order_by(
+            FlaggedPhoneNumber.id.desc()
+        )
+        .all()
+    )
+
+
+    # =====================================
+    # RENDER MANAGEMENT PAGE
+    # =====================================
+
+    return render_template(
+        "admin_phone_numbers.html",
+        flagged_numbers=flagged_numbers
+    )
+
+@app.route(
+    "/admin/phone-numbers/add",
+    methods=["POST"]
+)
+@login_required
+def admin_add_phone_number():
+
+    if current_user.role != "admin":
+
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+
+    phone_number = request.form.get(
+        "phone_number",
+        ""
+    ).strip()
+
+    risk_level = request.form.get(
+        "risk_level",
+        "HIGH RISK"
+    ).strip()
+
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
+
+    source = request.form.get(
+        "source",
+        ""
+    ).strip()
+
+
+    if not phone_number:
+
+        flash(
+            "Phone number is required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_phone_numbers")
+        )
+
+
+    normalized_phone = normalize_phone_number(
+        phone_number
+    )
+
+
+    existing = (
+        FlaggedPhoneNumber.query
+        .filter_by(
+            phone_number=normalized_phone
+        )
+        .first()
+    )
+
+
+    if existing:
+
+        flash(
+            "This phone number already exists in the flagged-number database.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_phone_numbers")
+        )
+
+
+    flagged_number = FlaggedPhoneNumber(
+        phone_number=normalized_phone,
+        risk_level=risk_level,
+        description=description,
+        source=source or "ScamCheck Admin",
+        is_active=True
+    )
+
+
+    db.session.add(
+        flagged_number
+    )
+
+    db.session.commit()
+
+
+    flash(
+        "Flagged phone number added successfully.",
+        "success"
+    )
+
+
+    return redirect(
+        url_for("admin_phone_numbers")
+    )
+
+@app.route(
+    "/admin/phone-numbers/<int:number_id>/edit",
+    methods=["GET", "POST"]
+)
+@login_required
+def admin_edit_phone_number(number_id):
+
+    if current_user.role != "admin":
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+        return redirect(
+            url_for("home")
+        )
+
+    number = db.session.get(
+        FlaggedPhoneNumber,
+        number_id
+    )
+
+    if not number:
+        flash(
+            "Phone number record not found.",
+            "error"
+        )
+        return redirect(
+            url_for("admin_phone_numbers")
+        )
+
+    if request.method == "POST":
+
+        phone_number = request.form.get(
+            "phone_number",
+            ""
+        ).strip()
+
+        risk_level = request.form.get(
+            "risk_level",
+            "HIGH RISK"
+        ).strip()
+
+        description = request.form.get(
+            "description",
+            ""
+        ).strip()
+
+        source = request.form.get(
+            "source",
+            ""
+        ).strip()
+
+        normalized_phone = normalize_phone_number(
+            phone_number
+        )
+
+        duplicate = (
+            FlaggedPhoneNumber.query
+            .filter(
+                FlaggedPhoneNumber.phone_number
+                == normalized_phone,
+                FlaggedPhoneNumber.id
+                != number.id
+            )
+            .first()
+        )
+
+        if duplicate:
+            flash(
+                "Another record already uses this phone number.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "admin_edit_phone_number",
+                    number_id=number.id
+                )
+            )
+
+        number.phone_number = normalized_phone
+        number.risk_level = risk_level
+        number.description = description
+        number.source = source or "ScamCheck Admin"
+
+        db.session.commit()
+
+        flash(
+            "Phone number record updated successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("admin_phone_numbers")
+        )
+
+    return render_template(
+        "admin_edit_phone_number.html",
+        number=number
+    )
+
+@app.route(
+    "/admin/phone-numbers/<int:number_id>/delete",
+    methods=["POST"]
+)
+@login_required
+def admin_delete_phone_number(number_id):
+
+    if current_user.role != "admin":
+        flash(
+            "Administrator access required.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+    number = db.session.get(
+        FlaggedPhoneNumber,
+        number_id
+    )
+
+    if not number:
+        flash(
+            "Phone number record not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_phone_numbers")
+        )
+
+    db.session.delete(number)
+    db.session.commit()
+
+    flash(
+        "Flagged phone number deleted successfully.",
+        "success"
+    )
+
+    return redirect(
+        url_for("admin_phone_numbers")
+    )
+
 @app.route("/logout")
 @login_required
 def logout():
