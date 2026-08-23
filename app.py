@@ -36,11 +36,22 @@ load_dotenv()
 #=======================================================
 ABSTRACT_PHONE_API_KEY = os.getenv("ABSTRACT_PHONE_API_KEY")
 
+app = Flask(__name__)
 
+
+#======================================================
+# Public Service Announcements (PSA) for scam awareness
+#======================================================
+
+PSA_ALERTS = [
+    "Beware of impersonation scams requesting OTPs or urgent transfers.",
+    "Never share banking credentials or OTPs with anyone.",
+    "Verify suspicious requests through official channels."
+]
 #=======================================================
 #SQL Setup
 #=======================================================
-app = Flask(__name__)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///scamcheck.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -678,6 +689,11 @@ def analyse_phone_number(phone_number):
             "abuse_detected":
                 risk.get("is_abuse_detected")
         }
+    }
+@app.context_processor
+def inject_psa_alerts():
+    return {
+        "psa_alerts": PSA_ALERTS
     }
 
 @app.route('/')
