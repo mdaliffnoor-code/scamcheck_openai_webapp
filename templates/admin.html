@@ -105,22 +105,27 @@ Admin Dashboard | ScamCheck
 
             <!-- SCAN ACTIVITY -->
 
-            <div class="admin-card">
+            <a
+                href="{{ url_for('admin_activity') }}"
+                class="admin-card admin-card-active"
+            >
 
                 <span>04</span>
 
-                <h3>Scan Activity</h3>
+                <h3>
+                    Scan Activity
+                </h3>
 
                 <p>
-                    Review recent phone number, URL,
-                    and screenshot scans across ScamCheck.
+                    Review recent phone, URL, and screenshot scans
+                    performed across the ScamCheck platform.
                 </p>
 
-                <div class="admin-card-action admin-coming-soon">
-                    Coming Soon
+                <div class="admin-card-action">
+                    View Activity →
                 </div>
 
-            </div>
+            </a>
 
         </div>
 
