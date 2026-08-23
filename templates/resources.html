@@ -1,10 +1,186 @@
 {% extends "base.html" %}
-{% block title %}Resources | ScamCheck{% endblock %}
+
+{% block title %}
+Resources | ScamCheck
+{% endblock %}
+
 {% block content %}
-<section class="page-section"><div class="shell"><p class="eyebrow">SCAM AWARENESS</p><h1>Resources & Bulletins</h1><p class="page-intro">Scam awareness resources can later be stored in Azure Blob Storage, while bulletin metadata is stored in Azure SQL.</p>
-<div class="resource-grid">
-<article class="resource-card"><span>AUG 2026</span><h3>Monthly Scam Bulletin</h3><p>Placeholder for your first uploaded scam-awareness PDF.</p><button disabled>PDF Coming Soon</button></article>
-<article class="resource-card"><span>GUIDE</span><h3>How to Spot Phishing</h3><p>Common warning signs before entering personal or banking information.</p><button disabled>Coming Soon</button></article>
-<article class="resource-card"><span>GUIDE</span><h3>Suspicious Calls</h3><p>Practical steps to take when receiving an unexpected request.</p><button disabled>Coming Soon</button></article>
-</div></div></section>
+
+<section class="page-section">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            SCAM AWARENESS
+        </p>
+
+        <h1>
+            Resources & Bulletins
+        </h1>
+
+        <p class="page-intro">
+            Scam awareness resources and monthly bulletins to help
+            users recognise common scam techniques and warning signs.
+        </p>
+
+
+        <div class="resource-grid">
+
+
+            <!-- =====================================
+                 MONTHLY SCAM BULLETIN
+                 ===================================== -->
+
+            <article class="resource-card">
+
+                {% if current_bulletin %}
+
+                    <span>
+                        {{ current_bulletin.publication_date.strftime("%b %Y").upper() }}
+                    </span>
+
+                    <h3>
+                        {{ current_bulletin.title }}
+                    </h3>
+
+                    <p>
+                        {{ current_bulletin.description }}
+                    </p>
+
+
+                    <a
+                        href="{{ url_for(
+                            'view_bulletin',
+                            bulletin_id=current_bulletin.id
+                        ) }}"
+                        class="primary-button"
+                    >
+                        View PDF
+                    </a>
+
+
+                    {% if previous_bulletins %}
+
+                        <div class="previous-bulletins">
+
+                            <button
+                                type="button"
+                                id="previousBulletinsToggle"
+                                class="previous-bulletins-toggle"
+                            >
+                                Previous Bulletins
+                                <span>▼</span>
+                            </button>
+
+
+                            <div
+                                id="previousBulletinsMenu"
+                                class="previous-bulletins-menu"
+                            >
+
+                                {% for bulletin in previous_bulletins %}
+
+                                    <a
+                                        href="{{ url_for(
+                                            'view_bulletin',
+                                            bulletin_id=bulletin.id
+                                        ) }}"
+                                    >
+                                        {{ bulletin.publication_date.strftime("%B %Y") }}
+                                    </a>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <span>
+                        BULLETIN
+                    </span>
+
+                    <h3>
+                        Monthly Scam Bulletin
+                    </h3>
+
+                    <p>
+                        No scam bulletin has been published yet.
+                    </p>
+
+                    <button disabled>
+                        PDF Coming Soon
+                    </button>
+
+                {% endif %}
+
+            </article>
+
+
+
+            <!-- =====================================
+                 GUIDE 1
+                 FUTURE FEATURE
+                 ===================================== -->
+
+            <article class="resource-card">
+
+                <span>
+                    GUIDE
+                </span>
+
+                <h3>
+                    How to Spot Phishing
+                </h3>
+
+                <p>
+                    Common warning signs before entering
+                    personal or banking information.
+                </p>
+
+                <button disabled>
+                    Coming Soon
+                </button>
+
+            </article>
+
+
+
+            <!-- =====================================
+                 GUIDE 2
+                 FUTURE FEATURE
+                 ===================================== -->
+
+            <article class="resource-card">
+
+                <span>
+                    GUIDE
+                </span>
+
+                <h3>
+                    Suspicious Calls
+                </h3>
+
+                <p>
+                    Practical steps to take when receiving
+                    an unexpected request.
+                </p>
+
+                <button disabled>
+                    Coming Soon
+                </button>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
 {% endblock %}

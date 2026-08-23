@@ -81,3 +81,29 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+
+// =========================================
+// PREVIOUS BULLETINS DROPDOWN
+// =========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const toggle =
+        document.getElementById("previousBulletinsToggle");
+
+    const menu =
+        document.getElementById("previousBulletinsMenu");
+
+
+    if (!toggle || !menu) {
+        return;
+    }
+
+
+    toggle.addEventListener("click", function () {
+
+        menu.classList.toggle("active");
+
+    });
+
+});

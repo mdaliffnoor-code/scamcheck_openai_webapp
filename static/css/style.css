@@ -1133,3 +1133,214 @@ html[data-theme="dark"] .footer-brand { color: var(--gold); }
     }
 
 }
+
+/* =========================================
+   ADMIN DASHBOARD
+   ========================================= */
+
+.admin-grid {
+    margin-top: 38px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.admin-card {
+    display: block;
+    padding: 30px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-card > span {
+    color: var(--blue);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.admin-card h3 {
+    margin: 14px 0 10px;
+    font-size: 1.2rem;
+}
+
+.admin-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.admin-card-active {
+    cursor: pointer;
+}
+
+.admin-card-active:hover {
+    transform: translateY(-3px);
+    border-color: var(--blue);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.admin-card-action {
+    margin-top: 24px;
+    color: var(--blue-light);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.admin-coming-soon {
+    color: var(--soft);
+}
+
+.admin-note {
+    margin-top: 28px;
+}
+
+.admin-note h3 {
+    margin-top: 12px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 760px) {
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* =========================================
+   PREVIOUS BULLETINS DROPDOWN
+========================================= */
+
+.previous-bulletins {
+    margin-top: 18px;
+    position: relative;
+}
+
+.previous-bulletins-toggle {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--line);
+    border-radius: 7px;
+
+    background: var(--panel);
+    color: var(--text);
+
+    cursor: pointer;
+
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.previous-bulletins-toggle:hover {
+    border-color: var(--blue);
+    background: var(--hover-bg);
+}
+
+.previous-bulletins-menu {
+    display: none;
+
+    margin-top: 8px;
+
+    border: 1px solid var(--line);
+    border-radius: 7px;
+
+    background: var(--panel);
+
+    overflow: hidden;
+}
+
+.previous-bulletins-menu.active {
+    display: block;
+}
+
+.previous-bulletins-menu a {
+    display: block;
+
+    padding: 11px 14px;
+
+    border-bottom: 1px solid var(--line);
+
+    color: var(--text);
+
+    font-size: 0.88rem;
+}
+
+.previous-bulletins-menu a:last-child {
+    border-bottom: 0;
+}
+
+.previous-bulletins-menu a:hover {
+    background: var(--hover-bg);
+    color: var(--blue-light);
+}
+
+/* =========================================
+   BULLETIN ADMIN CONTROLS
+========================================= */
+
+.bulletin-admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.bulletin-admin-actions form {
+    margin: 0;
+}
+
+.bulletin-status {
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.bulletin-status.published {
+    color: var(--green);
+}
+
+.bulletin-status.hidden {
+    color: var(--muted);
+}
+
+.bulletin-toggle-button,
+.bulletin-delete-button {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 7px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.bulletin-toggle-button {
+    border: 1px solid var(--blue);
+    color: var(--blue-light);
+}
+
+.bulletin-toggle-button:hover {
+    background: var(--hover-bg);
+}
+
+.bulletin-delete-button {
+    border: 1px solid var(--red);
+    color: var(--red);
+}
+
+.bulletin-delete-button:hover {
+    background: rgba(228, 125, 141, 0.1);
+}
