@@ -1,0 +1,21 @@
+    <div class="psa-track">
+
+        <div class="psa-content">
+
+            {% for alert in psa_alerts %}
+
+                <span class="psa-item">
+                    {{ alert }}
+                </span>
+
+                {% if not loop.last %}
+                    <span class="psa-separator">•</span>
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
