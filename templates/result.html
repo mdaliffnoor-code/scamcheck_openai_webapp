@@ -8,6 +8,157 @@
 <div class="result-row"><span>Submitted</span><strong>{{ result.value }}</strong></div>
 <div class="result-risk"><span>Risk Level</span><strong>{{ result.risk }}</strong></div>
 <div class="result-section"><h3>Assessment</h3><p class="result-summary">{{ result.summary }}</p></div>
+
+{% if result.type == "Phone Number" and result.details %}
+
+<div class="result-section">
+
+    <h3>Phone Intelligence</h3>
+
+    <div class="result-row">
+        <span>Data Source</span>
+
+        <strong>
+            {% if result.source == "internal_database" %}
+                ScamCheck Database
+            {% else %}
+                Abstract Phone Intelligence
+            {% endif %}
+        </strong>
+    </div>
+
+
+    {% if result.details.get("valid") is not none %}
+
+    <div class="result-row">
+        <span>Valid Number</span>
+
+        <strong>
+            {% if result.details.get("valid") %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("line_status") %}
+
+    <div class="result-row">
+        <span>Line Status</span>
+        <strong>
+            {{ result.details.get("line_status") }}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("carrier") %}
+
+    <div class="result-row">
+        <span>Carrier</span>
+        <strong>
+            {{ result.details.get("carrier") }}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("line_type") %}
+
+    <div class="result-row">
+        <span>Line Type</span>
+        <strong>
+            {{ result.details.get("line_type") }}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("country") %}
+
+    <div class="result-row">
+        <span>Country</span>
+        <strong>
+            {{ result.details.get("country") }}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("api_risk") %}
+
+    <div class="result-row">
+        <span>External Risk Level</span>
+        <strong>
+            {{ result.details.get("api_risk") }}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("voip") is not none %}
+
+    <div class="result-row">
+        <span>VoIP</span>
+
+        <strong>
+            {% if result.details.get("voip") %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("disposable") is not none %}
+
+    <div class="result-row">
+        <span>Disposable Number</span>
+
+        <strong>
+            {% if result.details.get("disposable") %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </strong>
+    </div>
+
+    {% endif %}
+
+
+    {% if result.details.get("abuse_detected") is not none %}
+
+    <div class="result-row">
+        <span>Abuse Detected</span>
+
+        <strong>
+            {% if result.details.get("abuse_detected") %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </strong>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+
 <div class="result-section"><h3>Recommended Action</h3><p>{{ result.recommendation }}</p></div>
 </div>
 <div class="result-links"><a class="outline-link" href="{{ url_for('home') }}">← Run another check</a><a class="outline-link" href="{{ url_for('resources') }}">View scam resources →</a></div>

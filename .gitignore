@@ -5,3 +5,6 @@ __pycache__/
 .env
 uploads/*
 !uploads/.gitkeep
+
+# SQLite database
+instance/*.db

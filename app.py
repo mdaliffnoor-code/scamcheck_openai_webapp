@@ -31,10 +31,15 @@ from datetime import datetime, timezone
 
 load_dotenv()
 
+#=======================================================
+#Phone Number Scanner API Key
+#=======================================================
+ABSTRACT_PHONE_API_KEY = os.getenv("ABSTRACT_PHONE_API_KEY")
+
 app = Flask(__name__)
 
 
-#======================================================
+#=====================================================
 # Public Service Announcements (PSA) for scam awareness
 #======================================================
 
@@ -150,6 +155,50 @@ class ScanHistory(db.Model):
         db.DateTime,
         nullable=False,
         default=lambda: datetime.now(timezone.utc)
+    )
+
+# Define the FlaggedPhoneNumber model to store flagged phone numbers
+class FlaggedPhoneNumber(db.Model):
+
+    __tablename__ = "flagged_phone_numbers"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    phone_number = db.Column(
+        db.String(30),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    risk_level = db.Column(
+        db.String(30),
+        nullable=False,
+        default="HIGH RISK"
+    )
+
+    description = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    source = db.Column(
+        db.String(100),
+        nullable=True
+    )
+
+    is_active = db.Column(
+        db.Boolean,
+        default=True,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
     )
 
 #user loader callback for Flask-Login
@@ -353,6 +402,309 @@ Do not include any text before or after the JSON.
 
     return result
 
+#Phone scanner phone number normalization function
+def normalize_phone_number(phone_number):
+
+    phone_number = phone_number.strip()
+
+    cleaned = ""
+
+    for character in phone_number:
+
+        if character.isdigit() or character == "+":
+            cleaned += character
+
+    return cleaned
+
+# Function to check phone number using Abstract Phone API
+def check_abstract_phone(phone_number):
+
+    api_key = os.getenv("ABSTRACT_PHONE_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "ABSTRACT_PHONE_API_KEY is not configured."
+        )
+
+    url = "https://phoneintelligence.abstractapi.com/v1/"
+
+    try:
+
+        print("Calling Abstract API for:", phone_number)
+
+        response = requests.get(
+            url,
+            params={
+                "api_key": api_key,
+                "phone": phone_number
+            },
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        print("Abstract API response:")
+        print(data)
+
+        return data
+
+    except requests.RequestException as error:
+
+        print("Abstract Phone API error:", error)
+
+        return None
+
+def analyse_phone_number(phone_number):
+
+    # =====================================
+    # 1. NORMALIZE PHONE NUMBER
+    # =====================================
+
+    normalized_phone = normalize_phone_number(
+        phone_number
+    )
+
+
+    # =====================================
+    # 2. CHECK INTERNAL DATABASE
+    # =====================================
+
+    flagged_number = (
+        FlaggedPhoneNumber.query
+        .filter_by(
+            phone_number=normalized_phone,
+            is_active=True
+        )
+        .first()
+    )
+
+
+    # =====================================
+    # 3. IF FOUND IN DATABASE
+    # =====================================
+
+    if flagged_number:
+
+        return {
+            "source": "internal_database",
+
+            "phone_number":
+                normalized_phone,
+
+            "risk_level":
+                flagged_number.risk_level,
+
+            "suspicious_indicators": [
+                "Number found in ScamCheck flagged-number database"
+            ],
+
+            "explanation":
+                flagged_number.description
+                or
+                "This number exists in the ScamCheck flagged-number database.",
+
+            "recommended_action":
+                "Do not provide personal information or make payments "
+                "until the caller has been independently verified.",
+
+            "details": {
+                "reported_source":
+                    flagged_number.source
+            }
+        }
+
+
+    # ===================================
+    # 4. NOT FOUND → CALL ABSTRACT API
+    # =====================================
+
+    api_result = check_abstract_phone(
+        normalized_phone
+    )
+
+
+    # =====================================
+    # 5. API FAILED
+    # =====================================
+
+    if api_result is None:
+
+        return {
+            "source": "abstract_api",
+
+            "phone_number":
+                normalized_phone,
+
+            "risk_level":
+                "UNKNOWN",
+
+            "suspicious_indicators": [],
+
+            "explanation":
+                "The external phone intelligence service "
+                "could not be reached.",
+
+            "recommended_action":
+                "Exercise caution and independently verify the caller.",
+
+            "details": {}
+        }
+
+
+    # =====================================
+    # 6. EXTRACT ABSTRACT DATA SAFELY
+    # =====================================
+
+    validation = (
+        api_result.get("phone_validation")
+        or {}
+    )
+
+    risk = (
+        api_result.get("phone_risk")
+        or {}
+    )
+
+    carrier = (
+        api_result.get("phone_carrier")
+        or {}
+    )
+
+    location = (
+        api_result.get("phone_location")
+        or {}
+    )
+
+
+    # =====================================
+    # 7. CONVERT ABSTRACT RISK
+    #    TO SCAMCHECK RISK
+    # =====================================
+
+    abstract_risk = (
+        risk.get("risk_level")
+        or ""
+    ).strip().lower()
+
+
+    if (
+        abstract_risk == "high"
+        or risk.get("is_abuse_detected") is True
+    ):
+
+        scamcheck_risk = "HIGH RISK"
+
+
+    elif (
+        abstract_risk == "medium"
+        or risk.get("is_disposable") is True
+    ):
+
+        scamcheck_risk = "POTENTIAL RISK"
+
+
+    elif abstract_risk == "low":
+
+        scamcheck_risk = "LOW"
+
+
+    else:
+
+        scamcheck_risk = "UNKNOWN"
+
+
+    # =====================================
+    # 8. BUILD SUSPICIOUS INDICATORS
+    # =====================================
+
+    suspicious_indicators = []
+
+
+    if risk.get("is_abuse_detected") is True:
+
+        suspicious_indicators.append(
+            "Abuse has been detected for this number"
+        )
+
+
+    if risk.get("is_disposable") is True:
+
+        suspicious_indicators.append(
+            "Disposable phone number detected"
+        )
+
+
+    if validation.get("is_voip") is True:
+
+        suspicious_indicators.append(
+            "This number uses a VoIP service"
+        )
+
+
+    if validation.get("is_valid") is False:
+
+        suspicious_indicators.append(
+            "Phone number could not be validated"
+        )
+
+
+    # =====================================
+    # 9. RETURN ABSTRACT RESULT
+    # =====================================
+
+    return {
+        "source":
+            "abstract_api",
+
+        "phone_number":
+            normalized_phone,
+
+        "risk_level":
+            scamcheck_risk,
+
+        "suspicious_indicators":
+            suspicious_indicators,
+
+        "explanation":
+            "No active ScamCheck database report was found. "
+            "The number was checked using external phone intelligence.",
+
+        "recommended_action":
+            "If the caller requests money, credentials or OTPs, "
+            "verify the request using an official contact channel.",
+
+        "details": {
+
+            "valid":
+                validation.get("is_valid"),
+
+            "line_status":
+                validation.get("line_status"),
+
+            "voip":
+                validation.get("is_voip"),
+
+            "carrier":
+                carrier.get("name"),
+
+            "line_type":
+                carrier.get("line_type"),
+
+            "country":
+                location.get("country_name"),
+
+            "api_risk":
+                risk.get("risk_level"),
+
+            "disposable":
+                risk.get("is_disposable"),
+
+            "abuse_detected":
+                risk.get("is_abuse_detected")
+        }
+    }
 
 @app.context_processor
 def inject_psa_alerts():
@@ -368,18 +720,124 @@ def home():
 @app.route('/check-phone', methods=['POST'])
 @login_required
 def check_phone():
-    phone = request.form.get('phone', '').strip()
+
+    phone = request.form.get(
+        'phone',
+        ''
+    ).strip()
+
     if not phone:
-        flash('Please enter a phone number.', 'error')
-        return redirect(url_for('home'))
+
+        flash(
+            'Please enter a phone number.',
+            'error'
+        )
+
+        return redirect(
+            url_for('home')
+        )
+
+
+    # =====================================
+    # ANALYSE PHONE NUMBER
+    # =====================================
+
+    analysis = analyse_phone_number(
+        phone
+    )
+
+
+    # =====================================
+    # BUILD RESULT FOR result.html
+    # =====================================
+
+    indicators = analysis.get(
+        "suspicious_indicators",
+        []
+    )
+
+
+    if indicators:
+
+        indicators_text = "\n".join(
+            f"• {indicator}"
+            for indicator in indicators
+        )
+
+    else:
+
+        indicators_text = (
+            "• No specific suspicious indicators detected."
+        )
+
+
+    summary = (
+        f"{analysis['explanation']}\n\n"
+        f"Indicators:\n"
+        f"{indicators_text}"
+    )
+
+
     result = {
-        'type': 'Phone Number',
-        'value': phone,
-        'risk': 'Unknown',
-        'summary': 'Demo lookup only. Connect Azure SQL scam reports here.',
-        'recommendation': 'Verify the caller using an official contact channel.'
-    }
-    return render_template('result.html', result=result)
+    'type': 'Phone Number',
+    'value': analysis["phone_number"],
+    'risk': analysis["risk_level"],
+    'summary': summary,
+    'recommendation': analysis["recommended_action"],
+
+    # NEW
+    'source': analysis.get("source"),
+    'details': analysis.get("details", {})
+}
+
+
+    # =====================================
+    # SAVE TO SCAN HISTORY
+    # =====================================
+
+    scan = ScanHistory(
+
+        user_id=current_user.id,
+
+        scan_type="phone",
+
+        input_value=
+            analysis["phone_number"],
+
+        risk_level=
+            analysis["risk_level"],
+
+        result_summary=
+            analysis["explanation"],
+
+        suspicious_indicators=
+            json.dumps(
+                analysis.get(
+                    "suspicious_indicators",
+                    []
+                )
+            ),
+
+        recommended_action=
+            analysis["recommended_action"],
+
+        blob_name=None
+    )
+
+
+    db.session.add(scan)
+
+    db.session.commit()
+
+
+    # =====================================
+    # DISPLAY RESULT
+    # =====================================
+
+    return render_template(
+        'result.html',
+        result=result
+    )
 
 
 @app.route('/check-url', methods=['POST'])
