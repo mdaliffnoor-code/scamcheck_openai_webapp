@@ -47,6 +47,7 @@
 
         <nav class="nav-links" aria-label="Main navigation">
             <a href="{{ url_for('home') }}" class="nav-link nav-link-active">Check</a>
+            <a href="{{ url_for('about') }}">About</a>
             <a href="{{ url_for('resources') }}" class="nav-link">Resources</a>
 
             {% if current_user.is_authenticated %}

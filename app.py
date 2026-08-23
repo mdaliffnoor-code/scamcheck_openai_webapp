@@ -798,6 +798,10 @@ def home():
     return render_template('index.html')
 
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 @app.route('/check-phone', methods=['POST'])
 @login_required
 def check_phone():

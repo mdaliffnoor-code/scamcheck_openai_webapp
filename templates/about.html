@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block title %}
+About | ScamCheck
+{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+
+    <div class="shell about-hero-grid">
+
+        <div>
+
+            <p class="eyebrow">
+                ABOUT SCAMCHECK
+            </p>
+
+            <h1>
+                Helping you make safer decisions online.
+            </h1>
+
+            <p class="about-lead">
+                ScamCheck is a scam-awareness and screening platform
+                designed to help users assess suspicious phone numbers,
+                website links, and screenshots before deciding how to respond.
+            </p>
+
+            <p class="about-lead">
+                The platform combines internal scam records,
+                external safety services, and AI-assisted analysis
+                to provide an advisory risk assessment.
+            </p>
+
+            <a
+                href="{{ url_for('home') }}"
+                class="primary-button"
+            >
+                Try ScamCheck
+            </a>
+
+        </div>
+
+
+        <div class="about-hero-visual">
+
+            <div class="about-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="about-orbit about-orbit-phone">
+                <i class="fa-solid fa-phone"></i>
+            </div>
+
+            <div class="about-orbit about-orbit-web">
+                <i class="fa-solid fa-globe"></i>
+            </div>
+
+            <div class="about-orbit about-orbit-message">
+                <i class="fa-solid fa-message"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="about-section">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            HOW IT WORKS
+        </p>
+
+        <h2 class="section-title">
+            How ScamCheck Works
+        </h2>
+
+        <p class="page-intro">
+            A simple four-step process to help you assess suspicious content.
+        </p>
+
+
+        <div class="about-steps">
+
+
+            <div class="about-step">
+
+                <span class="about-step-number">
+                    01
+                </span>
+
+                <div class="about-step-icon">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                </div>
+
+                <h3>
+                    Submit
+                </h3>
+
+                <p>
+                    Enter a phone number or website URL,
+                    or upload a screenshot of suspicious content.
+                </p>
+
+            </div>
+
+
+            <div class="about-step">
+
+                <span class="about-step-number">
+                    02
+                </span>
+
+                <div class="about-step-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+
+                <h3>
+                    Check
+                </h3>
+
+                <p>
+                    ScamCheck checks available internal records,
+                    external safety services, or AI-assisted analysis
+                    depending on the type of scan.
+                </p>
+
+            </div>
+
+
+            <div class="about-step">
+
+                <span class="about-step-number">
+                    03
+                </span>
+
+                <div class="about-step-icon">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </div>
+
+                <h3>
+                    Review
+                </h3>
+
+                <p>
+                    Review the returned risk level,
+                    suspicious indicators, explanation,
+                    and recommended action.
+                </p>
+
+            </div>
+
+
+            <div class="about-step">
+
+                <span class="about-step-number">
+                    04
+                </span>
+
+                <div class="about-step-icon">
+                    <i class="fa-solid fa-shield"></i>
+                </div>
+
+                <h3>
+                    Decide
+                </h3>
+
+                <p>
+                    Use the information to make a more informed decision
+                    and independently verify suspicious requests where necessary.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="about-section about-section-soft">
+
+    <div class="shell">
+
+        <p class="eyebrow">
+            SCAMCHECK TOOLS
+        </p>
+
+        <h2 class="section-title">
+            What You Can Check
+        </h2>
+
+
+        <div class="about-tools">
+
+
+            <article class="about-tool-card">
+
+                <div class="about-tool-icon">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+
+                <h3>
+                    Phone Numbers
+                </h3>
+
+                <p>
+                    ScamCheck first checks its internal flagged-number
+                    database. If no record is found, the number can be
+                    checked using external phone intelligence.
+                </p>
+
+                <a href="{{ url_for('home') }}">
+                    Check a phone number →
+                </a>
+
+            </article>
+
+
+            <article class="about-tool-card">
+
+                <div class="about-tool-icon">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+
+                <h3>
+                    Website URLs
+                </h3>
+
+                <p>
+                    Website links are checked against Google Safe Browsing
+                    for known unsafe resources such as malicious or
+                    social-engineering websites.
+                </p>
+
+                <a href="{{ url_for('home') }}">
+                    Check a URL →
+                </a>
+
+            </article>
+
+
+            <article class="about-tool-card">
+
+                <div class="about-tool-icon">
+                    <i class="fa-solid fa-image"></i>
+                </div>
+
+                <h3>
+                    Screenshots
+                </h3>
+
+                <p>
+                    Uploaded screenshots are analysed for possible scam indicators
+                    such as urgent language, requests for money, OTPs,
+                    credentials, impersonation, and suspicious links.
+                </p>
+
+                <a href="{{ url_for('home') }}">
+                    Analyse a screenshot →
+                </a>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="about-section">
+
+    <div class="shell about-info-grid">
+
+        <div class="about-info-card">
+
+            <p class="eyebrow">
+                OUR PURPOSE
+            </p>
+
+            <h2>
+                Building scam awareness
+            </h2>
+
+            <p>
+                ScamCheck aims to make scam screening easier to understand
+                by bringing several checking methods into one platform.
+            </p>
+
+            <p>
+                The goal is not to replace independent verification,
+                but to provide users with useful information before they
+                respond to suspicious requests.
+            </p>
+
+        </div>
+
+
+        <div class="about-info-card about-warning-card">
+
+            <p class="eyebrow">
+                IMPORTANT REMINDER
+            </p>
+
+            <h2>
+                A risk result is advisory
+            </h2>
+
+            <p>
+                ScamCheck does not guarantee that content marked as LOW
+                is safe, and a HIGH RISK result should still be considered
+                alongside other available information.
+            </p>
+
+            <div class="about-warning">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <span>
+                    Never provide passwords, OTPs, banking credentials,
+                    or payment information solely because a message
+                    appears legitimate.
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="about-section">
+
+    <div class="shell">
+
+        <div class="about-cta">
+
+            <div>
+
+                <p class="eyebrow">
+                    STAY INFORMED
+                </p>
+
+                <h2>
+                    Learn about current scam risks.
+                </h2>
+
+                <p>
+                    Visit ScamCheck Resources for monthly bulletins
+                    and scam-awareness guides.
+                </p>
+
+            </div>
+
+            <a
+                href="{{ url_for('resources') }}"
+                class="primary-button"
+            >
+                View Resources
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

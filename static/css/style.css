@@ -1463,3 +1463,321 @@ html[data-theme="dark"] .footer-brand { color: var(--gold); }
 .table-filter-header input::placeholder {
     color: var(--muted);
 }
+
+/* =========================================
+   ABOUT PAGE
+========================================= */
+
+.about-hero {
+    padding: 80px 0;
+}
+
+.about-hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 70px;
+    align-items: center;
+}
+
+.about-hero h1 {
+    margin: 10px 0 22px;
+    max-width: 700px;
+
+    font-size: clamp(2.6rem, 5vw, 4.8rem);
+    line-height: 1.05;
+}
+
+.about-lead {
+    max-width: 700px;
+    color: var(--muted);
+    line-height: 1.75;
+}
+
+.about-hero .primary-button {
+    display: inline-block;
+    margin-top: 18px;
+}
+
+
+/* HERO VISUAL */
+
+.about-hero-visual {
+    min-height: 360px;
+    position: relative;
+
+    display: grid;
+    place-items: center;
+}
+
+.about-shield {
+    width: 190px;
+    height: 230px;
+
+    display: grid;
+    place-items: center;
+
+    border: 2px solid var(--blue);
+    border-radius: 36% 36% 45% 45%;
+
+    background: var(--panel);
+
+    font-size: 5rem;
+    color: var(--blue);
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+}
+
+.about-orbit {
+    position: absolute;
+
+    width: 64px;
+    height: 64px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid var(--line);
+    border-radius: 50%;
+
+    background: var(--panel);
+
+    font-size: 1.3rem;
+}
+
+.about-orbit-phone {
+    left: 10%;
+    top: 28%;
+    color: var(--green);
+}
+
+.about-orbit-web {
+    right: 7%;
+    top: 20%;
+    color: var(--blue);
+}
+
+.about-orbit-message {
+    right: 12%;
+    bottom: 16%;
+    color: var(--amber);
+}
+
+
+/* GENERAL ABOUT SECTIONS */
+
+.about-section {
+    padding: 72px 0;
+    border-top: 1px solid var(--line);
+}
+
+.about-section-soft {
+    background: var(--bg-soft);
+}
+
+
+/* HOW IT WORKS */
+
+.about-steps {
+    margin-top: 40px;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.about-step {
+    padding: 26px;
+
+    border: 1px solid var(--line);
+    border-radius: 12px;
+
+    background: var(--panel);
+}
+
+.about-step-number {
+    color: var(--blue);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+}
+
+.about-step-icon {
+    width: 54px;
+    height: 54px;
+
+    margin: 22px 0 18px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid var(--blue);
+    border-radius: 10px;
+
+    color: var(--blue);
+    font-size: 1.3rem;
+}
+
+.about-step h3 {
+    margin: 0 0 10px;
+}
+
+.about-step p {
+    margin: 0;
+
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+
+/* TOOLS */
+
+.about-tools {
+    margin-top: 38px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.about-tool-card {
+    padding: 28px;
+
+    border: 1px solid var(--line);
+    border-radius: 12px;
+
+    background: var(--panel);
+}
+
+.about-tool-icon {
+    width: 58px;
+    height: 58px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid var(--blue);
+    border-radius: 10px;
+
+    color: var(--blue);
+    font-size: 1.4rem;
+}
+
+.about-tool-card h3 {
+    margin: 20px 0 10px;
+}
+
+.about-tool-card p {
+    min-height: 110px;
+
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.about-tool-card a {
+    color: var(--blue-light);
+    font-weight: 700;
+}
+
+
+/* PURPOSE + REMINDER */
+
+.about-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.about-info-card {
+    padding: 32px;
+
+    border: 1px solid var(--line);
+    border-radius: 12px;
+
+    background: var(--panel);
+}
+
+.about-info-card h2 {
+    margin: 10px 0 18px;
+}
+
+.about-info-card p {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.about-warning {
+    margin-top: 24px;
+    padding: 18px;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    border: 1px solid var(--amber);
+    border-radius: 10px;
+
+    color: var(--amber);
+}
+
+
+/* CTA */
+
+.about-cta {
+    padding: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    border: 1px solid var(--line);
+    border-radius: 12px;
+
+    background: var(--panel);
+}
+
+.about-cta h2 {
+    margin: 8px 0;
+}
+
+.about-cta p {
+    margin: 0;
+    color: var(--muted);
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .about-hero-grid,
+    .about-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-steps {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about-tools {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .about-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .about-cta {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .about-hero-visual {
+        min-height: 300px;
+    }
+
+}
