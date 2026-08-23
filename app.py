@@ -31,11 +31,22 @@ from datetime import datetime, timezone
 
 load_dotenv()
 
+app = Flask(__name__)
 
+
+#======================================================
+# Public Service Announcements (PSA) for scam awareness
+#======================================================
+
+PSA_ALERTS = [
+    "Beware of impersonation scams requesting OTPs or urgent transfers.",
+    "Never share banking credentials or OTPs with anyone.",
+    "Verify suspicious requests through official channels."
+]
 #=======================================================
 #SQL Setup
 #=======================================================
-app = Flask(__name__)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///scamcheck.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -343,6 +354,11 @@ Do not include any text before or after the JSON.
     return result
 
 
+@app.context_processor
+def inject_psa_alerts():
+    return {
+        "psa_alerts": PSA_ALERTS
+    }
 
 @app.route('/')
 def home():

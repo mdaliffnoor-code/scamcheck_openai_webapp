@@ -989,3 +989,147 @@ html[data-theme="dark"] .footer-brand { color: var(--gold); }
     .modal-grid { grid-template-columns: 1fr; }
     .auth-required-actions { flex-direction: column; }
 }
+
+/* =========================================================
+   SCAMCHECK PSA TICKER
+========================================================= */
+
+.psa-ticker {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+
+    overflow: hidden;
+}
+
+
+/* LEFT ALERT LABEL */
+
+.psa-label {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 18px;
+
+    background: var(--amber);
+    color: #172033;
+
+    font-size: 0.9rem;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+
+    z-index: 2;
+}
+
+
+/* MOVING AREA */
+
+.psa-track {
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+
+    position: relative;
+}
+
+
+/* MOVING TEXT */
+
+.psa-content {
+    display: inline-flex;
+    align-items: center;
+
+    width: max-content;
+
+    white-space: nowrap;
+
+    padding-left: 100%;
+
+    animation:
+        psa-scroll 32s linear infinite;
+}
+
+
+/* INDIVIDUAL MESSAGE */
+
+.psa-item {
+    color: var(--text);
+
+    font-size: 1.1rem;
+    font-weight: 500;
+
+    padding: 0 12px;
+}
+
+
+/* DOT BETWEEN MESSAGES */
+
+.psa-separator {
+    color: var(--amber);
+    font-weight: 900;
+
+    padding: 0 8px;
+}
+
+
+/* MOVEMENT */
+
+@keyframes psa-scroll {
+
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+
+}
+
+
+/* PAUSE WHEN USER HOVERS */
+
+.psa-track:hover .psa-content {
+    animation-play-state: paused;
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .psa-content {
+        animation: none;
+        padding-left: 20px;
+        white-space: normal;
+    }
+
+}
+
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+
+    .psa-label {
+        padding: 10px 12px;
+        font-size: 0.65rem;
+    }
+
+    .psa-item {
+        font-size: 0.78rem;
+    }
+
+}
